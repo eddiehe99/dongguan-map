@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>纽伯格林赛道地图</title>
+  <!-- 引入地图库 Leaflet 的样式 -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- 引入你的CSS文件 -->
+  <link rel="stylesheet" href="assets/main.css">
+</head>
+<body>
+  <div id="app">
+    <!-- 左侧地图区域（替换原来的SVG地图） -->
+    <div class="track-map">
+      <div class="inner">
+        <!-- 新的GeoJSON地图容器 -->
+        <div id="geojson-map"></div>
+      </div>
+    </div>
+
+    <!-- 右侧描述区域（保持原样，不用改） -->
+    <div class="desc">
+      <!-- 这里是原来的描述内容，比如赛道信息等 -->
+    </div>
+  </div>
+
+  <!-- 引入地图库 Leaflet 的JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- 引入你的JS文件 -->
+  <script src="assets/main.js"></script>
+</body>
+</html>
