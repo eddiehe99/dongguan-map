@@ -1,33 +1,213 @@
-<!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hans">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>纽伯格林赛道地图</title>
-  <!-- 引入地图库 Leaflet 的样式 -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <!-- 引入你的CSS文件 -->
-  <link rel="stylesheet" href="assets/main.css">
+    <meta charset="UTF-8">
+    <title>An Interactive Map of Nürburgring 纽北赛道地图</title>
+    <meta name="robots" content="noodp" />
+    <meta name="author" content="JJ Ying" />
+    <meta name="description"
+        content="Learn the name of every corner in the famous race track: Nürburgring 可交互的纽博格林北环赛道地图，展示了众多弯道的介绍和图片" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+    <meta name="format-detection" content="telephone=no">
+
+    <meta property="og:url" content="https://jjying.com/nurburgring">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="纽北赛道地图">
+    <meta property="og:description" content="可交互的纽博格林北环赛道地图，展示了众多弯道的介绍和图片">
+    <meta property="og:image" content="https://s.anyway.red/nurburgring/og.png">
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="纽北赛道地图" />
+    <meta name="twitter:description" content="可交互的纽博格林北环赛道地图，展示了众多弯道的介绍和图片" />
+    <meta name="twitter:site" content="@JJYing" />
+    <meta name="twitter:image" content="https://s.anyway.red/nurburgring/og.png" />
+
+    <link rel="preconnect" href="https://s.anyway.red">
+    <link rel="preconnect" href="https://anyway.fm">
+    <link rel="stylesheet" href="main.css" />
+
+    <link rel="stylesheet" href="https://s.anyway.red/nurburgring/sm/result.css" />
+    <link rel="icon" href="https://s.anyway.red/nurburgring/fav.png">
+
+    <style>
+        [v-cloak],
+        .hidden-area {
+            display: none;
+        }
+    </style>
+
+    <script>
+        let lang = 'cn'
+    </script>
+
 </head>
+
 <body>
-  <div id="app">
-    <!-- 左侧地图区域（替换原来的SVG地图） -->
-    <div class="track-map">
-      <div class="inner">
-        <!-- 新的GeoJSON地图容器 -->
-        <div id="geojson-map"></div>
-      </div>
+    <div id="app" :class="[showAllCornerNames ? 'show-all-corners' : '', lang ]">
+        <div class="track-map">
+            <div class="inner">
+                <svg id="track" viewBox="0 0 660 530" class="main-svg" width="6600px" height="5300px">
+                    <!-- GeoJSON 路径将在这里被添加 -->
+                </svg>
+            </div>
+        </div>
+        <div class="desc skew-p">
+            <div class="logo">
+                <div class="inner skew-n">
+                    <span id="logoTitleCn" class="title-font">纽<span>博格林</span>北<span>环</span>赛道地图</span>
+                    <img src="https://s.anyway.red/nurburgring/logo.svg  " alt="纽北赛道地图" />
+                </div>
+            </div>
+            <div class="corner-info">
+                <!-- <div class="inner" v-if="currentCorner && p > 0" v-cloak>
+                    <div class="primary skew-n title-font" v-if="lang == 'cn' && currentCorner.ch"
+                        :class="currentCorner.ch == currentCorner.nk ? 'qt' : '' " v-cloak>{{currentCorner.ch}}
+                    </div>
+                    <div class="primary skew-n" v-if="lang == 'en' && currentCorner.en" v-cloak>{{currentCorner.en}}
+                    </div>
+                    <div class="secondary skew-n" v-if="currentCorner.en" v-cloak>
+                        <span class="extra" v-if="currentCorner.de">
+                            <svg viewBox="0 0 5 3" class="skew-p">
+                                <rect id="black_stripe" width="5" height="3" y="0" x="0" fill="#000" />
+                                <rect id="red_stripe" width="5" height="2" y="1" x="0" fill="#6C6C6C" />
+                                <rect id="gold_stripe" width="5" height="1" y="2" x="0" fill="#DADADA" />
+                            </svg> {{currentCorner.de}}
+                        </span>
+                    </div>
+                    <div class="more skew-n" v-if="lang == 'cn' && currentCorner.more" v-html="currentCorner.more">
+                    </div>
+                </div> -->
+                <div id="currentCornerInfoContainer" class="inner"> <!-- 初始隐藏，由 JS 控制 -->
+                    <!-- 显示当前弯道名称 (中文) -->
+                    <div id="currentCornerNameCn" class="primary skew-n title-font"></div>
+                    <!-- 显示当前弯道名称 (英文) -->
+                    <div id="currentCornerNameEn" class="primary skew-n"></div>
+                    <!-- 显示德语名称 -->
+                    <div id="currentCornerSecondary" class="secondary skew-n">
+                        <span id="currentCornerDe" class="extra"> <!-- 初始隐藏 -->
+                            <svg viewBox="0 0 5 3" class="skew-p">
+                                <rect id="black_stripe" width="5" height="3" y="0" x="0" fill="#000" />
+                                <rect id="red_stripe" width="5" height="2" y="1" x="0" fill="#6C6C6C" />
+                                <rect id="gold_stripe" width="5" height="1" y="2" x="0" fill="#DADADA" />
+                            </svg>
+                            <span id="currentCornerDeText"></span> <!-- 德语名称文本 -->
+                        </span>
+                    </div>
+                    <!-- 显示弯道介绍 (中文) -->
+                    <div id="currentCornerMore" class="more skew-n"></div>
+                </div>
+                <div id="endingMessageContainer" class="inner desc-msg" style="display: none;"> <!-- 初始隐藏 -->
+                    <div id="endingMessage" class="ending skew-n">
+                        The End
+                        <div id="startOverBtn" class='btn skew-p'>
+                            <!-- 为不同语言准备按钮文本元素 -->
+                            <div id="startOverBtnTextCn" class='skew-n title-font'>回到起点</div>
+                            <div id="startOverBtnTextEn" class='skew-n' style="display: none;">Start Over</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <div class="inner skew-n">
+                    <div @click="openModal('text')" role="button" class="link">
+                        <template v-if="lang == 'cn'">关于本站</template>
+                        <template v-if="lang == 'en'">About</template>
+                    </div>
+                    <div class="toggle-group" id="darkModeToggleGroup" class="off"> <!-- 移除 :class 和 @click -->
+                        <span id="darkModeToggleText">深色模式</span> <!-- 移除 v-if，添加 id 用于 JS 操作 -->
+                        <div class="toggle"></div>
+                    </div>
+                    <div class="toggle-group" id="langToggleGroup" class="off"> <!-- 移除 :class 和 @click -->
+                        <span id="langToggleText">中文</span> <!-- 移除 v-if，添加 id 用于 JS 操作 -->
+                        <div class="toggle"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- 右侧描述区域（保持原样，不用改） -->
-    <div class="desc">
-      <!-- 这里是原来的描述内容，比如赛道信息等 -->
-    </div>
-  </div>
+    <script src='assets/vue-2.6.11.min.js'></script>
+    <script src="main.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/topojson@3"></script>
+    <!-- <svg id="map-svg"></svg> -->
+    <script>
+        // 你的 D3.js 代码块
+        document.addEventListener("DOMContentLoaded", function () {
+            const svg = d3.select("#track");
 
-  <!-- 引入地图库 Leaflet 的JS -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <!-- 引入你的JS文件 -->
-  <script src="assets/main.js"></script>
+            d3.json("441900.geojson").then(function (geojsonData) {
+                console.log("GeoJSON loaded:", geojsonData);
+
+                const projection = d3.geoMercator()
+                    .fitSize([660, 530], geojsonData);
+
+                const pathGenerator = d3.geoPath().projection(projection);
+
+                const bounds = pathGenerator.bounds(geojsonData);
+                const dx = bounds[1][0] - bounds[0][0];
+                const dy = bounds[1][1] - bounds[0][1];
+                const padding = 5;
+                const x = bounds[0][0] - padding;
+                const y = bounds[0][1] - padding;
+                const width = dx + 2 * padding;
+                const height = dy + 2 * padding;
+
+                svg.attr("viewBox", `${x} ${y} ${width} ${height}`);
+
+                svg.append("path")
+                    .datum(geojsonData)
+                    .attr("class", "geojson-track")
+                    .attr("d", pathGenerator)
+                    .attr("fill", "none")
+                    .attr("stroke", "white")
+                    .attr("stroke-width", 2);
+            }).catch(function (error) {
+                console.error("Error loading GeoJSON:", error);
+            });
+
+            // --- 为按钮添加事件监听器 (调用 main.js 中定义的函数) ---
+            // 确保 main.js 已经执行并定义了这些函数
+            document.getElementById('langToggleGroup')?.addEventListener('click', window.toggleLang);
+            document.getElementById('darkModeToggleGroup')?.addEventListener('click', window.toggleDarkMode);
+            document.getElementById('startOverBtn')?.addEventListener('click', function () { window.setP(0.001); });
+            document.getElementById('aboutLinkText')?.addEventListener('click', function () { window.openModal('text'); });
+
+            // --- 初始化 UI (调用 main.js 中的函数) ---
+            window.updateUIBasedOnLanguage(window.currentLang || 'cn');
+            window.updateUIBasedOnDarkMode(window.isDarkMode || true);
+        });
+
+        // --- 关键：滚动事件监听器 ---
+        // 监听滚动事件 (调用 main.js 中的函数)
+        window.addEventListener('scroll', function () {
+            // console.log("Scroll event fired!"); // 可选：调试用
+
+            // 更新滚动条指示器 (如果需要)
+            const scrollIndicator = document.getElementById('scrollIndicator');
+            if (scrollIndicator) {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                const currentP = docHeight > 0 ? Math.min(1, scrollTop / docHeight) : 0;
+                scrollIndicator.style.width = (currentP * 100) + '%';
+            }
+
+            // 调用 main.js 中的更新函数
+            // 确保 main.js 中定义了 updateScrollDistance 并且已暴露到 window
+            if (typeof window.updateScrollDistance === 'function') {
+                // console.log("Calling updateScrollDistance from index.html"); // 可选：调试用
+                window.updateScrollDistance(); // 这是关键，调用 main.js 的函数
+            } else {
+                console.error("updateScrollDistance function not found on window object!");
+            }
+        });
+
+        // 页面加载后触发一次，设置初始状态
+        window.dispatchEvent(new Event('scroll'));
+
+    </script>
+
 </body>
+
 </html>
