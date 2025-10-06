@@ -19,6 +19,9 @@ let cornerEnd = 0; // 当前弯道结束位置
 let sectionStart = 0; // 当前路段开始位置
 let sectionEnd = 0; // 当前路段结束位置
 
+// 添加一个变量来记录当前高亮的元素 ID，以便移除旧的高亮
+let currentHighlightedPathId = null;
+
 let towns = [];
 
 // 加载 JSON 数据
@@ -373,67 +376,114 @@ function updateScrollDistance() {
   // --- 关键：调用 updateCornerDisplay 来更新显示 ---
   updateCornerDisplay();
 
+  updateSvgHighlight();
+
   // 如果还有其他需要根据滚动更新的 UI，也可以在这里调用对应的函数
   // 例如，更新 "The End" 消息的显示
   updateEndingDisplay(currentP); // 假设有这个函数
+
+  // --- 新增：更新 SVG 高亮显示 ---
+
+}
+
+// --- 新增函数：更新 SVG 高亮 ---
+function updateSvgHighlight() {
+  // 获取当前所有 corner-group 元素 (即包含 path 的 <g>)
+  const allCornerGroups = document.querySelectorAll('g.corner'); // 选择所有拥有 corner 类的 <g>
+
+  // 遍历所有 corner-group 元素
+  allCornerGroups.forEach(gElement => {
+    // 获取该 g 对应的 GeoJSON feature 的 id (通过 g 的 id 推断)
+    // 这里假设 g 的 id 格式是 `corner-group-${featureId}`
+    const gId = gElement.id;
+    const pathId = gId.replace('corner-group-', ''); // 从 g 的 id 中提取 path 的 id
+
+    // 检查当前的 g 元素是否对应于 main.js 中找到的 currentCorner
+    if (showCorner && currentCorner && pathId === currentCorner.id) {
+      // 获取 g 内的 path 元素
+      const pathElement = gElement.querySelector('path.path'); // 选择 g 内拥有 path 类的 path
+
+      if (pathElement) {
+        // 1. 设置 path 的 CSS 变量 --st 和 --ed (来自 main.js 的计算结果)
+        pathElement.style.setProperty('--st', window.cornerStart);
+        pathElement.style.setProperty('--ed', window.cornerEnd);
+        // 注意：--full 应该在加载 GeoJSON 时设置在 SVG 或 <g> 上，或者 pathGenerator 生成的每个 path 都知道自己的长度
+        // 如果每个 path 的长度不同且需要精确控制，这会变得复杂。通常 --full 是整个赛道的总长度。
+        // 你可能需要为每个 path 计算其相对于总长度的比例，或者重新考虑 --full 的定义。
+        // 简单起见，如果所有 path 都基于同一个坐标系统，可以设置一个全局的 --full。
+        // 例如：svgElement.style.setProperty('--full', totalTrackLength);
+
+        // 2. 控制 g 元素的显示/隐藏 (class)
+        gElement.classList.remove('hidden'); // 移除 hidden 类
+        gElement.classList.add('show');       // 添加 show 类
+      }
+
+
+
+    } else {
+      // 如果该 g 的 id 不匹配当前 corner，或者没有当前 corner，则隐藏它
+      gElement.classList.remove('show');
+      gElement.classList.add('hidden');
+    }
+  });
 }
 
 window.updateScrollDistance = updateScrollDistance;
 window.updateCornerDisplay = updateCornerDisplay; // 确保这一行存在
 
 function updateEndingDisplay(progress) {
-    const container = document.getElementById('endingMessageContainer');
-    const messageElement = document.getElementById('endingMessage'); // 通常不需要显式隐藏/显示这个，因为它在 container 内部
-    const startOverBtn = document.getElementById('startOverBtn');
-    const cnTextElement = document.getElementById('startOverBtnTextCn');
-    const enTextElement = document.getElementById('startOverBtnTextEn');
+  const container = document.getElementById('endingMessageContainer');
+  const messageElement = document.getElementById('endingMessage'); // 通常不需要显式隐藏/显示这个，因为它在 container 内部
+  const startOverBtn = document.getElementById('startOverBtn');
+  const cnTextElement = document.getElementById('startOverBtnTextCn');
+  const enTextElement = document.getElementById('startOverBtnTextEn');
 
-    if (container && startOverBtn && cnTextElement && enTextElement) {
-        // 检查滚动进度是否接近 1 (模拟 Vue 的 v-if="p > 0.999")
-        if (progress > 0.9625) {
-            container.style.display = ''; // 显示整个容器
+  if (container && startOverBtn && cnTextElement && enTextElement) {
+    // 检查滚动进度是否接近 1 (模拟 Vue 的 v-if="p > 0.999")
+    if (progress > 0.9625) {
+      container.style.display = ''; // 显示整个容器
 
-            // 根据当前语言显示按钮文本 (模拟 Vue 的 v-if="lang == 'cn'" 和 v-if="lang == 'en'")
-            if (currentLang === 'cn') {
-                cnTextElement.style.display = '';
-                enTextElement.style.display = 'none';
-            } else { // 假设不是 'cn' 就是 'en'
-                cnTextElement.style.display = 'none';
-                enTextElement.style.display = '';
-            }
-        } else {
-            // container.style.display = 'none'; // 隐藏整个容器
-        }
+      // 根据当前语言显示按钮文本 (模拟 Vue 的 v-if="lang == 'cn'" 和 v-if="lang == 'en'")
+      if (currentLang === 'cn') {
+        cnTextElement.style.display = '';
+        enTextElement.style.display = 'none';
+      } else { // 假设不是 'cn' 就是 'en'
+        cnTextElement.style.display = 'none';
+        enTextElement.style.display = '';
+      }
+    } else {
+      // container.style.display = 'none'; // 隐藏整个容器
     }
+  }
 }
 
 function setP(percentage) {
-    currentP = percentage; // 更新内部状态变量 (如果需要)
-    // 计算目标滚动位置
-    const scrollTarget = (body.scrollHeight - window.innerHeight) * percentage;
-    // 执行滚动
-    window.scrollTo({ top: scrollTarget, behavior: 'smooth' }); // 使用平滑滚动，或者 'auto' 立即滚动
-    // 重要：滚动后，需要触发 updateScrollDistance 来同步状态和 UI
-    updateScrollDistance(); // 这行很关键，确保滚动后 UI 更新
-    document.body.classList.remove("scrolled");
+  currentP = percentage; // 更新内部状态变量 (如果需要)
+  // 计算目标滚动位置
+  const scrollTarget = (body.scrollHeight - window.innerHeight) * percentage;
+  // 执行滚动
+  window.scrollTo({ top: scrollTarget, behavior: 'smooth' }); // 使用平滑滚动，或者 'auto' 立即滚动
+  // 重要：滚动后，需要触发 updateScrollDistance 来同步状态和 UI
+  updateScrollDistance(); // 这行很关键，确保滚动后 UI 更新
+  document.body.classList.remove("scrolled");
 }
 
 window.setP = setP;
 
 // --- 确保在 DOM 加载完成后为 "回到起点" 按钮添加点击事件监听器 ---
-document.addEventListener("DOMContentLoaded", function() {
-    // ... (之前的事件监听器绑定代码) ...
+document.addEventListener("DOMContentLoaded", function () {
+  // ... (之前的事件监听器绑定代码) ...
 
-    const startOverBtn = document.getElementById('startOverBtn');
-    if (startOverBtn) {
-        // 假设 setP 函数已经定义并且暴露在 window 对象上
-        startOverBtn.addEventListener('click', function() {
-            window.setP(0.0); // 模拟 Vue 的 @click="setP(0.001)"
-            document.body.classList.remove("scrolled");
-        });
-    } else {
-        console.warn("Start over button with ID 'startOverBtn' not found.");
-    }
+  const startOverBtn = document.getElementById('startOverBtn');
+  if (startOverBtn) {
+    // 假设 setP 函数已经定义并且暴露在 window 对象上
+    startOverBtn.addEventListener('click', function () {
+      window.setP(0.0); // 模拟 Vue 的 @click="setP(0.001)"
+      document.body.classList.remove("scrolled");
+    });
+  } else {
+    console.warn("Start over button with ID 'startOverBtn' not found.");
+  }
 
-    // ... (其他初始化代码) ...
+  // ... (其他初始化代码) ...
 });

@@ -46,8 +46,14 @@
     <div id="app" :class="[showAllCornerNames ? 'show-all-corners' : '', lang ]">
         <div class="track-map">
             <div class="inner">
-                <svg id="track" viewBox="0 0 660 530" class="main-svg" width="6600px" height="5300px">
+                <svg id="svg-track" viewBox="0 0 660 530" class="main-svg" width="6600px" height="5300px">
                     <!-- GeoJSON 路径将在这里被添加 -->
+                    <use href="#track" class="base base2" />
+                    <use href="#track" class="base" />
+                    <!-- <use href="#track" class="progress" /> -->
+                    <!-- <g id="cornerGroup" class="corner hidden">
+                        <use id="highlighted-segment" href="#track" class="path"></use>
+                    </g> -->
                 </svg>
             </div>
         </div>
@@ -135,7 +141,7 @@
     <script>
         // 你的 D3.js 代码块
         document.addEventListener("DOMContentLoaded", function () {
-            const svg = d3.select("#track");
+            const svg = d3.select("#svg-track");
 
             d3.json("441900.geojson").then(function (geojsonData) {
                 console.log("GeoJSON loaded:", geojsonData);
@@ -158,11 +164,39 @@
 
                 svg.append("path")
                     .datum(geojsonData)
-                    .attr("class", "geojson-track")
+                    .attr("id", "track")
+                    // .attr("class", "geojson-track")
                     .attr("d", pathGenerator)
                     .attr("fill", "none")
-                    .attr("stroke", "white")
-                    .attr("stroke-width", 2);
+                // .attr("stroke", "white")
+                // .attr("stroke-width", 2);
+
+                const features = geojsonData.features;
+
+                // --- 修改部分：为每个 Feature 创建 <g> 和 <path> ---
+                // 选择 <svg> 容器
+                const svgSelection = svg; // 或者 svg.select('g') 如果你有特定的组容器
+
+                // 为每个 Feature 创建一个 <g> 元素
+                const cornerGroups = svgSelection.selectAll("g.corner")
+                    .data(features)
+                    .enter()
+                    .append("g") // 创建 <g> 元素
+                    .attr("class", "corner") // 给 <g> 添加 'corner' 类和一个基于 id 的唯一类
+                    .attr("id", d => `corner-group-${d.properties.id}`); // 给 <g> 添加一个唯一的 ID
+
+                // 在每个 <g> 内部添加对应的 <path> 元素
+                cornerGroups
+                    .append("path")
+                    .attr("id", d => d.properties.id) // 保持你原来的 path ID
+                    .attr("class", "path") // 给 <path> 添加 'path' 类，使其匹配 CSS
+                    .attr("d", pathGenerator) // 使用 pathGenerator 生成路径
+                    .attr("fill", "none")
+                    // 注意：不要在这里设置 stroke，因为 CSS 会控制 stroke
+                    // .attr("stroke", ...) // 移除或注释掉
+                    // .attr("stroke-width", ...) // 移除或注释掉，CSS 会控制
+                    ;
+
             }).catch(function (error) {
                 console.error("Error loading GeoJSON:", error);
             });
