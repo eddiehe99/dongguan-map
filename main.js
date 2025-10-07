@@ -6,6 +6,8 @@ if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').match
 }
 
 let currentP = 0.0; // 滚动进度
+let mX= 0.0;
+let mY= 0.0;
 let currentLang = window.lang || 'cn'; // 语言，从 index.html 获取
 let showModal = false; // 模态框显示状态
 let showAllCornerNames = false; // 显示所有弯道名称
@@ -45,7 +47,7 @@ async function loadAppData() {
     // 填充数据
     towns = data.towns || [];
 
-    console.log('数据加载成功，镇街数量:', towns.length);
+    // console.log('数据加载成功，镇街数量:', towns.length);
     return true;
   } catch (error) {
     console.error('加载数据失败:', error);
@@ -72,29 +74,9 @@ async function initApp() {
 
 document.addEventListener('DOMContentLoaded', initApp);
 
-var d = new Vue({
-  el: '#app',
-  data: {
-    aboutContent: "网页设计 & 开发：<a href='https://jjying.com/' target='_blank'>JJ Ying</a><br/><br/><strong>参考信息:</strong><br/>· <a target='_blank' href='https://oversteer48.com/nurburgring-corner-names/'>Corner Names, Numbers and circuit map</a><br/>· <a target='_blank' href='https://nring.info/nurburgring-nordschleife-corners/'>NRing.info</a><br/>· <a target='_blank' href='https://www.youtube.com/watch?v=-lCR1_cDqTg'>Nürburgring Corner Names Explained</a><br/>· 键盘车神教教主视频：<a target='_blank' href='https://www.bilibili.com/video/BV1NntCe4ETM/'>纽北每一个弯的名字？</a><br/><br/><strong>页面源码:</strong><br/>· <a target='_blank' href='https://github.com/JJYing/Nurburgring-Map'>@GitHub</a>",
-    modalContent: "",
-    modalType: "text"
-  },
-  methods: {
-    innerModal: function (e) {
-      e.stopPropagation()
-    },
-    openModal: function (type, img = null) {
-      this.modalType = type
-      if (type == 'text') this.modalContent = this.aboutContent
-      if (type == 'image') {
-        this.modalContent = "<img src='" + 'https://s.anyway.red/nurburgring/' + img.src + '!/quality/80/progressive/true/ignore-error/true' + "'/>"
-        if (img.url) this.modalContent += "<div class='source-in-modal'>@<a href='" + img.url + "' target='_blank'>" + img.author + "</a></div>"
-      }
-      this.showModal = true
-    }
-
-  }
-})
+// var d = new Vue({
+//   el: '#app',
+// })
 
 // --- 定义 openModal 函数 ---
 function openModal(type, img = null) {
@@ -210,14 +192,14 @@ updatePageHeight()
 
 window.addEventListener("keyup", function (e) {
   if (e.key === "Escape") {
-    d.showModal = false
+    showModal = false
   }
 })
 
 document.querySelector('.track-map > .inner').addEventListener('mousemove', function (event) {
   const innerRect = this.getBoundingClientRect();
-  d.mX = (event.clientX - innerRect.left) / innerRect.width
-  d.mY = (event.clientY - innerRect.top) / innerRect.height
+  mX = (event.clientX - innerRect.left) / innerRect.width
+  mY = (event.clientY - innerRect.top) / innerRect.height
 });
 
 
@@ -715,13 +697,13 @@ function updateCornerNamesDiv() {
   });
 
   // 清理不再需要的元素（如果需要）
-  const allElements = container.querySelectorAll('.corner-name');
-  allElements.forEach(el => {
-    const id = el.getAttribute('data-id');
-    if (!processedIds.has(id)) {
-      el.remove();
-    }
-  });
+  // const allElements = container.querySelectorAll('.corner-name');
+  // allElements.forEach(el => {
+  //   const id = el.getAttribute('data-id');
+  //   if (!processedIds.has(id)) {
+  //     el.remove();
+  //   }
+  // });
 }
 
 window.updateCornerNamesDiv = updateCornerNamesDiv;

@@ -36,7 +36,8 @@
 </head>
 
 <body>
-    <div id="app" :class="[showAllCornerNames ? 'show-all-corners' : '', lang ]">
+    <!-- <div id="app" :class="[showAllCornerNames ? 'show-all-corners' : '', lang ]"> -->
+    <div id="app">
         <div class="track-map">
             <div class="inner">
                 <svg id="svg-track" viewBox="0 0 660 530" class="main-svg" width="6600px" height="5300px">
@@ -143,7 +144,7 @@
         </div>
     </div>
 
-    <script src='assets/vue-2.6.11.min.js'></script>
+    <!-- <script src='assets/vue-2.6.11.min.js'></script> -->
     <script src="main.js"></script>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://unpkg.com/topojson@3"></script>
@@ -154,7 +155,7 @@
             const svg = d3.select("#svg-track");
 
             d3.json("441900.geojson").then(function (geojsonData) {
-                console.log("GeoJSON loaded:", geojsonData);
+                // console.log("GeoJSON loaded:", geojsonData);
 
                 const projection = d3.geoMercator()
                     .fitSize([660, 530], geojsonData);
@@ -231,7 +232,7 @@
                 // --- 关键：在 D3.js Promise 完成（无论成功或失败）后，调用 updateCornerNamesDiv ---
                 // 确保 main.js 中的 updateCornerNamesDiv 函数已定义且 window.featureCentroids 已设置
                 if (window.updateCornerNamesDiv && window.featureCentroids) {
-                    console.log("Calling updateCornerNamesDiv after GeoJSON load.");
+                    // console.log("Calling updateCornerNamesDiv after GeoJSON load.");
                     window.updateCornerNamesDiv(); // 调用 main.js 中的函数
                 } else {
                     console.error("updateCornerNamesDiv function or featureCentroids not available.");
