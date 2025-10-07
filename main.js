@@ -572,9 +572,30 @@ function updateCornerNamesDiv() {
             textElement.textContent = currentLang === 'cn' ? town.ch : (town.en || town.ch);
         }
 
-        // 更新显示状态
-        const shouldShow = (town.st < currentP) || window.showAllCornerNames;
-        const isHighlighted = currentP >= town.st && currentP <= town.ed;
+        // --- 修改此处的逻辑 ---
+        // 计算是否应该显示 (基于滚动、进度和全局设置)
+        // const shouldShow = (town.st < currentP) || window.showAllCornerNames; // 原来的逻辑
+        const isScrolled = window.scrollY > 2; // 检查是否滚动超过 2px
+        const isPassed = town.st < currentP;    // 检查是否已超过该区域的起始点
+        const shouldShowBasedOnScroll = isScrolled; // 根据滚动状态决定是否显示
+        const shouldShowBasedOnProgressOrAll = isPassed || window.showAllCornerNames; // 原来的基于进度或全部显示的逻辑
+
+        // 你可以选择以下几种方式之一：
+        // 1. 只根据滚动状态 (最符合你的要求)
+        let shouldShow = shouldShowBasedOnScroll;
+
+        // 2. 或者，滚动后显示已过的 + 全部显示 (结合滚动和进度)
+        // let shouldShow = (isScrolled && isPassed) || window.showAllCornerNames;
+
+        // 3. 或者，滚动后显示全部，未滚动时按原逻辑 (优先考虑滚动)
+        // let shouldShow = isScrolled || shouldShowBasedOnProgressOrAll;
+
+        // 根据你的具体需求选择一种 shouldShow 逻辑
+        // 这里选择第 1 种：只根据滚动状态
+        shouldShow = shouldShowBasedOnScroll;
+
+        // --- end 修改 ---
+        const isHighlighted = currentP > town.st && currentP <= town.ed;
 
         element.classList.toggle('show', shouldShow);
         element.classList.toggle('hidden', !shouldShow);
@@ -628,3 +649,5 @@ function updateCornerNamesDiv() {
         }
     });
 }
+
+window.updateCornerNamesDiv = updateCornerNamesDiv;

@@ -2,39 +2,32 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>An Interactive Map of Nürburgring 纽北赛道地图</title>
-    <meta name="robots" content="noodp" />
-    <meta name="author" content="JJ Ying" />
+    <title>An Interactive Map of Dongguan 东莞市地图</title>
+    <meta name="robots" content="noodp, noydir" />
+    <meta name="author" content="Eddie He" />
     <meta name="description"
-        content="Learn the name of every corner in the famous race track: Nürburgring 可交互的纽博格林北环赛道地图，展示了众多弯道的介绍和图片" />
+        content="Learn the name of every town of the famous city: Dongguan 可交互的东莞市地图（政区版），展示了众多镇街的介绍。" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
     <meta name="format-detection" content="telephone=no">
 
     <meta property="og:url" content="https://jjying.com/nurburgring">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="纽北赛道地图">
-    <meta property="og:description" content="可交互的纽博格林北环赛道地图，展示了众多弯道的介绍和图片">
+    <meta property="og:title" content="东莞市地图">
+    <meta property="og:description" content="可交互的东莞市地图（政区版），展示了众多镇街的介绍。">
     <meta property="og:image" content="https://s.anyway.red/nurburgring/og.png">
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="纽北赛道地图" />
-    <meta name="twitter:description" content="可交互的纽博格林北环赛道地图，展示了众多弯道的介绍和图片" />
-    <meta name="twitter:site" content="@JJYing" />
+    <meta name="twitter:title" content="东莞市地图" />
+    <meta name="twitter:description" content="可交互的东莞市地图（政区版），展示了众多镇街的介绍。" />
+    <meta name="twitter:site" content="@eddiehe99" />
     <meta name="twitter:image" content="https://s.anyway.red/nurburgring/og.png" />
 
-    <link rel="preconnect" href="https://s.anyway.red">
-    <link rel="preconnect" href="https://anyway.fm">
+    <!-- <link rel="preconnect" href="https://s.anyway.red">
+    <link rel="preconnect" href="https://anyway.fm"> -->
     <link rel="stylesheet" href="main.css" />
 
-    <link rel="stylesheet" href="https://s.anyway.red/nurburgring/sm/result.css" />
+    <!-- <link rel="stylesheet" href="https://s.anyway.red/nurburgring/sm/result.css" /> -->
     <link rel="icon" href="https://s.anyway.red/nurburgring/fav.png">
-
-    <style>
-        [v-cloak],
-        .hidden-area {
-            display: none;
-        }
-    </style>
 
     <script>
         let lang = 'cn'
@@ -202,7 +195,16 @@
 
             }).catch(function (error) {
                 console.error("Error loading GeoJSON:", error);
-            });
+            }).finally(function () {
+                // --- 关键：在 D3.js Promise 完成（无论成功或失败）后，调用 updateCornerNamesDiv ---
+                // 确保 main.js 中的 updateCornerNamesDiv 函数已定义且 window.featureCentroids 已设置
+                if (window.updateCornerNamesDiv && window.featureCentroids) {
+                    console.log("Calling updateCornerNamesDiv after GeoJSON load.");
+                    window.updateCornerNamesDiv(); // 调用 main.js 中的函数
+                } else {
+                    console.error("updateCornerNamesDiv function or featureCentroids not available.");
+                }
+            });;
 
             // --- 为按钮添加事件监听器 (调用 main.js 中定义的函数) ---
             // 确保 main.js 已经执行并定义了这些函数
@@ -214,6 +216,7 @@
             // --- 初始化 UI (调用 main.js 中的函数) ---
             window.updateUIBasedOnLanguage(window.currentLang || 'cn');
             window.updateUIBasedOnDarkMode(window.isDarkMode || true);
+            window.updateCornerNamesDiv(); // 初始化弯道名称显示
         });
 
         // --- 关键：滚动事件监听器 ---

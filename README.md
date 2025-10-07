@@ -1,2 +1,4 @@
 # dongguan-map
-Online visulization for Dongguan, Guangdong province, China.
+
+> [!IMPORTANT]
+> The design of this project originate from https://github.com/JJYing/Nurburgring-Map.
