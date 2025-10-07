@@ -19,7 +19,12 @@ let cornerEnd = 0; // 当前弯道结束位置
 let sectionStart = 0; // 当前路段开始位置
 let sectionEnd = 0; // 当前路段结束位置
 
-let aboutContent = "网页设计 & 开发：<a href='https://jjying.com/' target='_blank'>JJ Ying</a><br/><br/><strong>参考信息:</strong><br/>· <a target='_blank' href='https://oversteer48.com/nurburgring-corner-names/'>Corner Names, Numbers and circuit map</a><br/>· <a target='_blank' href='https://nring.info/nurburgring-nordschleife-corners/'>NRing.info</a><br/>· <a target='_blank' href='https://www.youtube.com/watch?v=-lCR1_cDqTg'>Nürburgring Corner Names Explained</a><br/>· 键盘车神教教主视频：<a target='_blank' href='https://www.bilibili.com/video/BV1NntCe4ETM/'>纽北每一个弯的名字？</a><br/><br/><strong>页面源码:</strong><br/>· <a target='_blank' href='https://github.com/JJYing/Nurburgring-Map'>@GitHub</a>";
+let aboutContent = 
+  "网页设计 & 开发：<a href='https://www.eddiehe.top/' target='_blank'>Eddie He</a><br/><br/>\n" +
+  "<strong>参考信息:</strong><br/>\n" +
+  "· <a target='_blank' href='https://jjying.com/nurburgring/'>Nürburgring Map</a><br/><br/>\n" +
+  "<strong>页面源码:</strong><br/>\n" +
+  "· <a target='_blank' href='https://github.com/eddiehe99/dongguan-map'>@GitHub</a>";
 let modalContent = "";
 let modalType = "text";
 
@@ -263,7 +268,7 @@ function updateUIBasedOnLanguage(lang) {
   const logoTitleElement = document.querySelector('.desc .logo .inner .title-font');
   if (logoTitleElement) {
     // 注意：这里直接替换整个 innerHTML，如果结构复杂可能需要更精细的操作
-    logoTitleElement.innerHTML = lang === 'cn' ? '纽<span>博格林</span>北<span>环</span>赛道地图' : 'Nürburgring Map';
+    logoTitleElement.innerHTML = lang === 'cn' ? '东莞市地图<span>（政区版）</span>' : 'Dongguan Map';
   }
 
   // e. 更新其他控制按钮的文本 (如果 HTML 中给它们加了 id)
