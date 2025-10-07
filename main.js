@@ -452,6 +452,8 @@ function updateSvgHighlight() {
       gElement.classList.add('hidden');
     }
   });
+
+  updateCornerNamesDiv(); 
 }
 
 window.updateScrollDistance = updateScrollDistance;
@@ -513,3 +515,116 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // ... (其他初始化代码) ...
 });
+
+function updateCornerNamesDiv() {
+    const container = document.getElementById('town-names-container');
+    if (!container) return;
+
+    // 确保容器有正确的定位
+    if (container.style.position !== 'absolute') {
+        container.style.position = 'absolute';
+        container.style.left = '0';
+        container.style.top = '0';
+        container.style.width = '100%';
+        container.style.height = '100%';
+        container.style.pointerEvents = 'none'; // 允许点击穿透到 SVG
+    }
+
+    // 使用 Set 来跟踪已处理的元素，避免重复创建
+    const processedIds = new Set();
+
+    // 遍历 towns 数组
+    towns.forEach(town => {
+        const townId = town.id;
+        processedIds.add(townId);
+
+        // 查找或创建对应的 corner-name div 元素
+        let element = container.querySelector(`.corner-name[data-id="${townId}"]`);
+        if (!element) {
+            // 如果元素不存在，则创建它
+            element = document.createElement('div');
+            element.className = 'corner-name';
+            element.setAttribute('data-id', townId);
+
+            // 创建内部结构
+            const innerDiv1 = document.createElement('div');
+            const innerDiv2 = document.createElement('div');
+            innerDiv2.textContent = town.ch;
+            innerDiv1.appendChild(innerDiv2);
+            element.appendChild(innerDiv1);
+
+            // 添加点击事件
+            element.style.pointerEvents = 'auto';
+            element.addEventListener('click', (event) => {
+                event.stopPropagation();
+                if (typeof window.setP === 'function') {
+                    window.setP((town.st + town.ed) / 2);
+                }
+            });
+
+            container.appendChild(element);
+        }
+
+        // 更新文本内容
+        const currentLang = window.currentLang || 'cn';
+        const textElement = element.querySelector('div div');
+        if (textElement) {
+            textElement.textContent = currentLang === 'cn' ? town.ch : (town.en || town.ch);
+        }
+
+        // 更新显示状态
+        const shouldShow = (town.st < currentP) || window.showAllCornerNames;
+        const isHighlighted = currentP >= town.st && currentP <= town.ed;
+
+        element.classList.toggle('show', shouldShow);
+        element.classList.toggle('hidden', !shouldShow);
+        element.classList.toggle('highlighted', isHighlighted);
+
+        // --- 修复坐标计算 ---
+        const centroid = window.featureCentroids?.get(townId);
+        if (centroid) {
+            const [svgX, svgY] = centroid;
+            
+            const svgElement = document.getElementById('svg-track');
+            const containerElement = document.querySelector('.track-map > .inner');
+            
+            if (svgElement && containerElement) {
+                // 获取 SVG 的 viewBox
+                const viewBox = svgElement.viewBox.baseVal;
+
+                // 获取容器的 clientWidth/Height (内容区域尺寸，不包括 padding 和 border)
+                const containerWidth = containerElement.clientWidth;
+                const containerHeight = containerElement.clientHeight;
+
+                // 计算 SVG 坐标相对于 viewBox 的比例
+                const xRatio = (svgX - viewBox.x) / viewBox.width;
+                const yRatio = (svgY - viewBox.y) / viewBox.height;
+
+                // 计算在容器内容区域内的像素位置
+                const pixelX = xRatio * containerWidth;
+                const pixelY = yRatio * containerHeight;
+
+                // 设置位置 - 使用 transform 定位
+                // translate 可以精确控制，且不依赖于容器的定位属性
+                // 需要减去元素自身的一半宽高以实现中心对齐
+                // element.style.transform = `translate(${pixelX}px, ${pixelY}px)`;
+                // 为了居中，可以使用 CSS 的 transform-origin 或者 JS 计算偏移
+                // 更好的方式是在 CSS 中设置 transform-origin: center center;
+                element.style.transform = `translate(${pixelX}px, ${pixelY}px)`;
+
+                // 移除可能的 left/top 干扰
+                element.style.left = '0';
+                element.style.top = '0';
+            }
+        }
+    });
+
+    // 清理不再需要的元素（如果需要）
+    const allElements = container.querySelectorAll('.corner-name');
+    allElements.forEach(el => {
+        const id = el.getAttribute('data-id');
+        if (!processedIds.has(id)) {
+            el.remove();
+        }
+    });
+}

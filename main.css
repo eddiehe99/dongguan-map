@@ -305,6 +305,7 @@ body{
   translate: var(--tX) var(--tY);
   z-index: 3;
   animation: slowShow .3s var(--curve) .5s both;
+  /* transform-origin: center center; */
 
   & > div{
     line-height: 1;

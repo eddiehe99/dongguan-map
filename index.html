@@ -55,6 +55,9 @@
                         <use id="highlighted-segment" href="#track" class="path"></use>
                     </g> -->
                 </svg>
+                <div id="town-names-container">
+                    <!-- 这里的弯道名称将由 D3.js 动态添加 -->
+                </div>
             </div>
         </div>
         <div class="desc skew-p">
@@ -130,6 +133,17 @@
 
                 const projection = d3.geoMercator()
                     .fitSize([660, 530], geojsonData);
+
+                // --- 新增：计算并存储每个 feature 的 SVG 坐标 ---
+                const featureCentroids = new Map(); // 使用 Map 存储 id -> [x, y] 的映射
+                geojsonData.features.forEach(feature => {
+                    const centroid = d3.geoCentroid(feature);
+                    const [x, y] = projection(centroid);
+                    featureCentroids.set(feature.properties.id, [x, y]);
+                });
+                // 将坐标映射存储到全局变量或方便访问的地方，供 update 函数使用
+                window.featureCentroids = featureCentroids;
+                // --- end 新增 ---
 
                 const pathGenerator = d3.geoPath().projection(projection);
 
