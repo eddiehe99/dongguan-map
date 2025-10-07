@@ -14,11 +14,9 @@
 - [iWun/china_geojson](https://github.com/iWun/china_geojson)
 - [mikedeng/city_geojson](https://github.com/mikedeng/city_geojson)
 
-
 ## References
 
 - [rockyuse/svgmap](https://github.com/rockyuse/svgmap)
 - [Dongguan Map](https://zjj.dg.gov.cn/mware_cms/notice/dgmapIndex.gs)
 - [TangSY/echarts-map-demo](https://github.com/TangSY/echarts-map-demo)
 - [geojson.cn](https://geojson.cn)
-
