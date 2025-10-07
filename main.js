@@ -19,6 +19,10 @@ let cornerEnd = 0; // 当前弯道结束位置
 let sectionStart = 0; // 当前路段开始位置
 let sectionEnd = 0; // 当前路段结束位置
 
+let aboutContent = "网页设计 & 开发：<a href='https://jjying.com/' target='_blank'>JJ Ying</a><br/><br/><strong>参考信息:</strong><br/>· <a target='_blank' href='https://oversteer48.com/nurburgring-corner-names/'>Corner Names, Numbers and circuit map</a><br/>· <a target='_blank' href='https://nring.info/nurburgring-nordschleife-corners/'>NRing.info</a><br/>· <a target='_blank' href='https://www.youtube.com/watch?v=-lCR1_cDqTg'>Nürburgring Corner Names Explained</a><br/>· 键盘车神教教主视频：<a target='_blank' href='https://www.bilibili.com/video/BV1NntCe4ETM/'>纽北每一个弯的名字？</a><br/><br/><strong>页面源码:</strong><br/>· <a target='_blank' href='https://github.com/JJYing/Nurburgring-Map'>@GitHub</a>";
+let modalContent = "";
+let modalType = "text";
+
 // 添加一个变量来记录当前高亮的元素 ID，以便移除旧的高亮
 let currentHighlightedPathId = null;
 
@@ -66,22 +70,6 @@ document.addEventListener('DOMContentLoaded', initApp);
 var d = new Vue({
   el: '#app',
   data: {
-    p: 0.5,
-    w: 660,
-    h: 530,
-    mX: 0,
-    mY: 0,
-    showModal: false,
-    showAllCornerNames: false,
-    darkMode: window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches,
-    showCorner: false,
-    showSection: false,
-    currentCorner: null,
-    scrollDistance: 0,
-    cornerStart: 0,
-    cornerEnd: 0,
-    sectionStart: 0,
-    sectionEnd: 0,
     aboutContent: "网页设计 & 开发：<a href='https://jjying.com/' target='_blank'>JJ Ying</a><br/><br/><strong>参考信息:</strong><br/>· <a target='_blank' href='https://oversteer48.com/nurburgring-corner-names/'>Corner Names, Numbers and circuit map</a><br/>· <a target='_blank' href='https://nring.info/nurburgring-nordschleife-corners/'>NRing.info</a><br/>· <a target='_blank' href='https://www.youtube.com/watch?v=-lCR1_cDqTg'>Nürburgring Corner Names Explained</a><br/>· 键盘车神教教主视频：<a target='_blank' href='https://www.bilibili.com/video/BV1NntCe4ETM/'>纽北每一个弯的名字？</a><br/><br/><strong>页面源码:</strong><br/>· <a target='_blank' href='https://github.com/JJYing/Nurburgring-Map'>@GitHub</a>",
     modalContent: "",
     modalType: "text"
@@ -102,6 +90,87 @@ var d = new Vue({
 
   }
 })
+
+// --- 定义 openModal 函数 ---
+function openModal(type, img = null) {
+    const modal = document.getElementById('modal');
+    const modalBody = document.getElementById('modal-body');
+
+    if (modal && modalBody) {
+        // 清空之前的内容
+        modalBody.innerHTML = '';
+
+        if (type === 'text') {
+            // 设置文本内容
+            modalBody.innerHTML = aboutContent; // 使用上面定义的常量
+        } else if (type === 'image' && img) {
+            // 设置图片内容
+            // 注意：移除了 URL 中的多余空格
+            let imgHtml = `<img src='https://s.anyway.red/nurburgring/${img.src}!/quality/80/progressive/true/ignore-error/true'/>`;
+            if (img.url && img.author) {
+                imgHtml += `<div class='source-in-modal'>@<a href='${img.url}' target='_blank'>${img.author}</a></div>`;
+            }
+            modalBody.innerHTML = imgHtml;
+        }
+
+        // 显示模态框
+        modal.classList.add('show');
+        // 如果需要，可以设置一个全局变量来跟踪模态框状态
+        // window.showModal = true;
+    } else {
+        console.error("Modal or modal-body element not found.");
+    }
+}
+
+// --- 定义 closeModal 函数 ---
+function closeModal() {
+    const modal = document.getElementById('modal');
+    if (modal) {
+        modal.classList.remove('show');
+        // window.showModal = false;
+    } else {
+        console.error("Modal element not found for closing.");
+    }
+}
+
+// --- 定义 innerModal 函数 (防止点击内容区域关闭模态框) ---
+function innerModal(event) {
+    // 这个函数的目的是阻止事件冒泡到模态框背景 (modal)，从而不触发关闭
+    // 在 HTML 中已经通过 onclick="innerModal(event)" 绑定
+    event.stopPropagation();
+}
+
+// --- 为模态框背景添加点击关闭功能 (在 DOM 加载完成后) ---
+document.addEventListener('DOMContentLoaded', function () {
+    const modal = document.getElementById('modal');
+    if (modal) {
+        // 当点击模态框背景 (非内容区域) 时，关闭模态框
+        modal.addEventListener('click', function(event) {
+            // 如果点击的是模态框背景 (modal 元素本身，而不是其子元素 .modal-content)
+            if (event.target === modal) {
+                closeModal();
+            }
+        });
+    }
+
+    // ... (之前的其他 DOMContentLoaded 内的事件监听器绑定代码) ...
+    const aboutLinkElement = document.getElementById('aboutLinkText');
+    if (aboutLinkElement) {
+        // 假设 openModal 函数已经定义并且暴露在 window 对象上
+        aboutLinkElement.addEventListener('click', function () {
+            window.openModal('text'); // 调用 main.js 中定义的 openModal 函数，传入 'text' 类型
+            // console.log("'About' link clicked, modal should open.")
+        });
+    } else {
+        console.warn("About link element with ID 'aboutLinkText' not found.");
+    }
+});
+
+// --- 将函数暴露到全局作用域，以便 HTML onclick 属性可以调用 ---
+// 确保这些函数在 HTML 尝试调用它们之前已经定义
+window.openModal = openModal;
+window.closeModal = closeModal;
+window.innerModal = innerModal;
 
 
 document.addEventListener('scroll', function (e) {
@@ -453,7 +522,7 @@ function updateSvgHighlight() {
     }
   });
 
-  updateCornerNamesDiv(); 
+  updateCornerNamesDiv();
 }
 
 window.updateScrollDistance = updateScrollDistance;
@@ -517,137 +586,137 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function updateCornerNamesDiv() {
-    const container = document.getElementById('town-names-container');
-    if (!container) return;
+  const container = document.getElementById('town-names-container');
+  if (!container) return;
 
-    // 确保容器有正确的定位
-    if (container.style.position !== 'absolute') {
-        container.style.position = 'absolute';
-        container.style.left = '0';
-        container.style.top = '0';
-        container.style.width = '100%';
-        container.style.height = '100%';
-        container.style.pointerEvents = 'none'; // 允许点击穿透到 SVG
+  // 确保容器有正确的定位
+  if (container.style.position !== 'absolute') {
+    container.style.position = 'absolute';
+    container.style.left = '0';
+    container.style.top = '0';
+    container.style.width = '100%';
+    container.style.height = '100%';
+    container.style.pointerEvents = 'none'; // 允许点击穿透到 SVG
+  }
+
+  // 使用 Set 来跟踪已处理的元素，避免重复创建
+  const processedIds = new Set();
+
+  // 遍历 towns 数组
+  towns.forEach(town => {
+    const townId = town.id;
+    processedIds.add(townId);
+
+    // 查找或创建对应的 corner-name div 元素
+    let element = container.querySelector(`.corner-name[data-id="${townId}"]`);
+    if (!element) {
+      // 如果元素不存在，则创建它
+      element = document.createElement('div');
+      element.className = 'corner-name';
+      element.setAttribute('data-id', townId);
+
+      // 创建内部结构
+      const innerDiv1 = document.createElement('div');
+      const innerDiv2 = document.createElement('div');
+      innerDiv2.textContent = town.ch;
+      innerDiv1.appendChild(innerDiv2);
+      element.appendChild(innerDiv1);
+
+      // 添加点击事件
+      element.style.pointerEvents = 'auto';
+      element.addEventListener('click', (event) => {
+        event.stopPropagation();
+        if (typeof window.setP === 'function') {
+          window.setP((town.st + town.ed) / 2);
+        }
+      });
+
+      container.appendChild(element);
     }
 
-    // 使用 Set 来跟踪已处理的元素，避免重复创建
-    const processedIds = new Set();
+    // 更新文本内容
+    const currentLang = window.currentLang || 'cn';
+    const textElement = element.querySelector('div div');
+    if (textElement) {
+      textElement.textContent = currentLang === 'cn' ? town.ch : (town.en || town.ch);
+    }
 
-    // 遍历 towns 数组
-    towns.forEach(town => {
-        const townId = town.id;
-        processedIds.add(townId);
+    // --- 修改此处的逻辑 ---
+    // 计算是否应该显示 (基于滚动、进度和全局设置)
+    // const shouldShow = (town.st < currentP) || window.showAllCornerNames; // 原来的逻辑
+    const isScrolled = window.scrollY > 2; // 检查是否滚动超过 2px
+    const isPassed = town.st < currentP;    // 检查是否已超过该区域的起始点
+    const shouldShowBasedOnScroll = isScrolled; // 根据滚动状态决定是否显示
+    const shouldShowBasedOnProgressOrAll = isPassed || window.showAllCornerNames; // 原来的基于进度或全部显示的逻辑
 
-        // 查找或创建对应的 corner-name div 元素
-        let element = container.querySelector(`.corner-name[data-id="${townId}"]`);
-        if (!element) {
-            // 如果元素不存在，则创建它
-            element = document.createElement('div');
-            element.className = 'corner-name';
-            element.setAttribute('data-id', townId);
+    // 你可以选择以下几种方式之一：
+    // 1. 只根据滚动状态 (最符合你的要求)
+    let shouldShow = shouldShowBasedOnScroll;
 
-            // 创建内部结构
-            const innerDiv1 = document.createElement('div');
-            const innerDiv2 = document.createElement('div');
-            innerDiv2.textContent = town.ch;
-            innerDiv1.appendChild(innerDiv2);
-            element.appendChild(innerDiv1);
+    // 2. 或者，滚动后显示已过的 + 全部显示 (结合滚动和进度)
+    // let shouldShow = (isScrolled && isPassed) || window.showAllCornerNames;
 
-            // 添加点击事件
-            element.style.pointerEvents = 'auto';
-            element.addEventListener('click', (event) => {
-                event.stopPropagation();
-                if (typeof window.setP === 'function') {
-                    window.setP((town.st + town.ed) / 2);
-                }
-            });
+    // 3. 或者，滚动后显示全部，未滚动时按原逻辑 (优先考虑滚动)
+    // let shouldShow = isScrolled || shouldShowBasedOnProgressOrAll;
 
-            container.appendChild(element);
-        }
+    // 根据你的具体需求选择一种 shouldShow 逻辑
+    // 这里选择第 1 种：只根据滚动状态
+    shouldShow = shouldShowBasedOnScroll;
 
-        // 更新文本内容
-        const currentLang = window.currentLang || 'cn';
-        const textElement = element.querySelector('div div');
-        if (textElement) {
-            textElement.textContent = currentLang === 'cn' ? town.ch : (town.en || town.ch);
-        }
+    // --- end 修改 ---
+    const isHighlighted = currentP > town.st && currentP <= town.ed;
 
-        // --- 修改此处的逻辑 ---
-        // 计算是否应该显示 (基于滚动、进度和全局设置)
-        // const shouldShow = (town.st < currentP) || window.showAllCornerNames; // 原来的逻辑
-        const isScrolled = window.scrollY > 2; // 检查是否滚动超过 2px
-        const isPassed = town.st < currentP;    // 检查是否已超过该区域的起始点
-        const shouldShowBasedOnScroll = isScrolled; // 根据滚动状态决定是否显示
-        const shouldShowBasedOnProgressOrAll = isPassed || window.showAllCornerNames; // 原来的基于进度或全部显示的逻辑
+    element.classList.toggle('show', shouldShow);
+    element.classList.toggle('hidden', !shouldShow);
+    element.classList.toggle('highlighted', isHighlighted);
 
-        // 你可以选择以下几种方式之一：
-        // 1. 只根据滚动状态 (最符合你的要求)
-        let shouldShow = shouldShowBasedOnScroll;
+    // --- 修复坐标计算 ---
+    const centroid = window.featureCentroids?.get(townId);
+    if (centroid) {
+      const [svgX, svgY] = centroid;
 
-        // 2. 或者，滚动后显示已过的 + 全部显示 (结合滚动和进度)
-        // let shouldShow = (isScrolled && isPassed) || window.showAllCornerNames;
+      const svgElement = document.getElementById('svg-track');
+      const containerElement = document.querySelector('.track-map > .inner');
 
-        // 3. 或者，滚动后显示全部，未滚动时按原逻辑 (优先考虑滚动)
-        // let shouldShow = isScrolled || shouldShowBasedOnProgressOrAll;
+      if (svgElement && containerElement) {
+        // 获取 SVG 的 viewBox
+        const viewBox = svgElement.viewBox.baseVal;
 
-        // 根据你的具体需求选择一种 shouldShow 逻辑
-        // 这里选择第 1 种：只根据滚动状态
-        shouldShow = shouldShowBasedOnScroll;
+        // 获取容器的 clientWidth/Height (内容区域尺寸，不包括 padding 和 border)
+        const containerWidth = containerElement.clientWidth;
+        const containerHeight = containerElement.clientHeight;
 
-        // --- end 修改 ---
-        const isHighlighted = currentP > town.st && currentP <= town.ed;
+        // 计算 SVG 坐标相对于 viewBox 的比例
+        const xRatio = (svgX - viewBox.x) / viewBox.width;
+        const yRatio = (svgY - viewBox.y) / viewBox.height;
 
-        element.classList.toggle('show', shouldShow);
-        element.classList.toggle('hidden', !shouldShow);
-        element.classList.toggle('highlighted', isHighlighted);
+        // 计算在容器内容区域内的像素位置
+        const pixelX = xRatio * containerWidth;
+        const pixelY = yRatio * containerHeight;
 
-        // --- 修复坐标计算 ---
-        const centroid = window.featureCentroids?.get(townId);
-        if (centroid) {
-            const [svgX, svgY] = centroid;
-            
-            const svgElement = document.getElementById('svg-track');
-            const containerElement = document.querySelector('.track-map > .inner');
-            
-            if (svgElement && containerElement) {
-                // 获取 SVG 的 viewBox
-                const viewBox = svgElement.viewBox.baseVal;
+        // 设置位置 - 使用 transform 定位
+        // translate 可以精确控制，且不依赖于容器的定位属性
+        // 需要减去元素自身的一半宽高以实现中心对齐
+        // element.style.transform = `translate(${pixelX}px, ${pixelY}px)`;
+        // 为了居中，可以使用 CSS 的 transform-origin 或者 JS 计算偏移
+        // 更好的方式是在 CSS 中设置 transform-origin: center center;
+        element.style.transform = `translate(${pixelX}px, ${pixelY}px)`;
 
-                // 获取容器的 clientWidth/Height (内容区域尺寸，不包括 padding 和 border)
-                const containerWidth = containerElement.clientWidth;
-                const containerHeight = containerElement.clientHeight;
+        // 移除可能的 left/top 干扰
+        element.style.left = '0';
+        element.style.top = '0';
+      }
+    }
+  });
 
-                // 计算 SVG 坐标相对于 viewBox 的比例
-                const xRatio = (svgX - viewBox.x) / viewBox.width;
-                const yRatio = (svgY - viewBox.y) / viewBox.height;
-
-                // 计算在容器内容区域内的像素位置
-                const pixelX = xRatio * containerWidth;
-                const pixelY = yRatio * containerHeight;
-
-                // 设置位置 - 使用 transform 定位
-                // translate 可以精确控制，且不依赖于容器的定位属性
-                // 需要减去元素自身的一半宽高以实现中心对齐
-                // element.style.transform = `translate(${pixelX}px, ${pixelY}px)`;
-                // 为了居中，可以使用 CSS 的 transform-origin 或者 JS 计算偏移
-                // 更好的方式是在 CSS 中设置 transform-origin: center center;
-                element.style.transform = `translate(${pixelX}px, ${pixelY}px)`;
-
-                // 移除可能的 left/top 干扰
-                element.style.left = '0';
-                element.style.top = '0';
-            }
-        }
-    });
-
-    // 清理不再需要的元素（如果需要）
-    const allElements = container.querySelectorAll('.corner-name');
-    allElements.forEach(el => {
-        const id = el.getAttribute('data-id');
-        if (!processedIds.has(id)) {
-            el.remove();
-        }
-    });
+  // 清理不再需要的元素（如果需要）
+  const allElements = container.querySelectorAll('.corner-name');
+  allElements.forEach(el => {
+    const id = el.getAttribute('data-id');
+    if (!processedIds.has(id)) {
+      el.remove();
+    }
+  });
 }
 
 window.updateCornerNamesDiv = updateCornerNamesDiv;

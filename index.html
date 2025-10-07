@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
     <meta name="format-detection" content="telephone=no">
 
-    <meta property="og:url" content="https://jjying.com/nurburgring">
+    <meta property="og:url" content="https:/dongguan-map.eddiehe.top">
     <meta property="og:type" content="website">
     <meta property="og:title" content="东莞市地图">
     <meta property="og:description" content="可交互的东莞市地图（政区版），展示了众多镇街的介绍。">
@@ -94,9 +94,13 @@
 
             <div class="controls">
                 <div class="inner skew-n">
-                    <div @click="openModal('text')" role="button" class="link">
+                    <!-- <div @click="openModal('text')" role="button" class="link">
                         <template v-if="lang == 'cn'">关于本站</template>
                         <template v-if="lang == 'en'">About</template>
+                    </div> -->
+                    <div id="aboutLinkText" role="button" class="link">
+                        <span id="aboutTextCn" class="lang-text" data-lang="cn">关于本站</span>
+                        <span id="aboutTextEn" class="lang-text" data-lang="en" style="display: none;">About</span>
                     </div>
                     <div class="toggle-group" id="darkModeToggleGroup" class="off"> <!-- 移除 :class 和 @click -->
                         <span id="darkModeToggleText">深色模式</span> <!-- 移除 v-if，添加 id 用于 JS 操作 -->
@@ -106,6 +110,33 @@
                         <span id="langToggleText">中文</span> <!-- 移除 v-if，添加 id 用于 JS 操作 -->
                         <div class="toggle"></div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 模态框容器 -->
+        <!-- id 用于 JS 选择和控制显示/隐藏 -->
+        <!-- class 包含 modal 基础样式和 text 类型标识 -->
+        <!-- onclick="closeModal()" 绑定点击背景关闭事件 -->
+        <div id="modal" class="modal text" onclick="closeModal()">
+            <!-- 模态框内容区域 -->
+            <!-- class 包含 inner 基础样式 -->
+            <!-- onclick="innerModal(event)" 阻止点击内容区域时事件冒泡到背景，防止关闭 -->
+            <div class="inner" onclick="innerModal(event)">
+                <!-- 模态框内容体 -->
+                <!-- id 用于 JS 动态插入内容 -->
+                <!-- class 包含 modal-content 基础样式和 skew-n 变形样式 -->
+                <!-- onclick="closeModal()" (可选) 如果希望点击内容区域也关闭模态框，可以加上 -->
+                <div id="modal-body" class="modal-content skew-n"></div>
+                <!-- 模态框关闭按钮 -->
+                <!-- class 包含 modal-close 基础样式和 skew-n 变形样式 -->
+                <!-- onclick="closeModal()" 绑定点击关闭事件 -->
+                <div class="modal-close skew-n" onclick="closeModal()">
+                    <!-- 关闭按钮 SVG 图标 -->
+                    <svg viewBox="0 0 30 30">
+                        <circle cx="15" cy="15" r="12" />
+                        <path d="M10 10L20 20M20 10L10 20" />
+                    </svg>
                 </div>
             </div>
         </div>
