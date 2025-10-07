@@ -402,7 +402,7 @@ function updateSvgHighlight() {
     if (showCorner && currentCorner && pathId === currentCorner.id) {
       // 获取 g 内的 path 元素
       const pathElement = gElement.querySelector('path.path'); // 选择 g 内拥有 path 类的 path
-
+      const progressPathElement = gElement.querySelector('path.town-progress'); // 选择 g 内拥有 progress 类的 path
       if (pathElement) {
         // 1. 设置 path 的 CSS 变量 --st 和 --ed (来自 main.js 的计算结果)
         pathElement.style.setProperty('--st', window.cornerStart);
@@ -419,6 +419,32 @@ function updateSvgHighlight() {
       }
 
 
+      if (progressPathElement) {
+        // --- 应用 Progress 效果 ---
+        // 1. 设置进度相关的样式属性 (模拟 .progress 类)
+        // 注意：你需要知道这个 progressPathElement 的 *自身* 长度，或者一个相对于其长度的比例
+        // 假设我们想让这个区域的进度条根据 currentP 从 0% 变化到 100%
+        // 那么 stroke-dasharray 应该是 path 的长度，stroke-dashoffset 应该是 (1 - currentP) * 长度
+        // 但更简单的方式是，如果 currentP 在 [st, ed] 范围内，我们将其映射到 [0, 1] 作为这个区域的局部进度
+        // 局部进度 = (currentP - cornerStart) / (cornerEnd - cornerStart)
+        // 但 currentP 可能超出 [cornerStart, cornerEnd] 范围，所以需要 clamping
+        const localP = Math.max(0, Math.min(1, (currentP - cornerStart) / (cornerEnd - cornerStart)));
+
+        // 获取路径的总长度
+        const pathLength = progressPathElement.getTotalLength();
+
+        // 设置 stroke-dasharray 为 [可见长度, 隐藏长度]，其中可见长度是 localP * pathLength
+        // 或者设置为 [pathLength, pathLength]，然后用 offset 控制
+        // 推荐使用 [pathLength, pathLength] 方式，更稳定
+        progressPathElement.style.setProperty('stroke-dasharray', `${pathLength} ${pathLength}`);
+        // 设置 stroke-dashoffset，当 localP 为 1 时 offset 为 0 (完全显示)，当 localP 为 0 时 offset 为 -pathLength (完全隐藏)
+        progressPathElement.style.setProperty('stroke-dashoffset', `${pathLength * (1 - localP)}`);
+        // 设置其他进度条样式
+        progressPathElement.style.setProperty('stroke', 'var(--bg1)'); // 使用进度条颜色
+        progressPathElement.style.setProperty('stroke-width', '1px');
+        progressPathElement.style.setProperty('stroke-linecap', 'round');
+        progressPathElement.style.setProperty('transition', 'stroke-dashoffset 0.2s ease-out'); // 添加过渡效果
+      }
 
     } else {
       // 如果该 g 的 id 不匹配当前 corner，或者没有当前 corner，则隐藏它

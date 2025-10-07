@@ -48,7 +48,7 @@
             <div class="inner">
                 <svg id="svg-track" viewBox="0 0 660 530" class="main-svg" width="6600px" height="5300px">
                     <!-- GeoJSON 路径将在这里被添加 -->
-                    <use href="#track" class="base base2" />
+                    <!-- <use href="#track" class="base base2" /> -->
                     <use href="#track" class="base" />
                     <!-- <use href="#track" class="progress" /> -->
                     <!-- <g id="cornerGroup" class="corner hidden">
@@ -65,24 +65,6 @@
                 </div>
             </div>
             <div class="corner-info">
-                <!-- <div class="inner" v-if="currentCorner && p > 0" v-cloak>
-                    <div class="primary skew-n title-font" v-if="lang == 'cn' && currentCorner.ch"
-                        :class="currentCorner.ch == currentCorner.nk ? 'qt' : '' " v-cloak>{{currentCorner.ch}}
-                    </div>
-                    <div class="primary skew-n" v-if="lang == 'en' && currentCorner.en" v-cloak>{{currentCorner.en}}
-                    </div>
-                    <div class="secondary skew-n" v-if="currentCorner.en" v-cloak>
-                        <span class="extra" v-if="currentCorner.de">
-                            <svg viewBox="0 0 5 3" class="skew-p">
-                                <rect id="black_stripe" width="5" height="3" y="0" x="0" fill="#000" />
-                                <rect id="red_stripe" width="5" height="2" y="1" x="0" fill="#6C6C6C" />
-                                <rect id="gold_stripe" width="5" height="1" y="2" x="0" fill="#DADADA" />
-                            </svg> {{currentCorner.de}}
-                        </span>
-                    </div>
-                    <div class="more skew-n" v-if="lang == 'cn' && currentCorner.more" v-html="currentCorner.more">
-                    </div>
-                </div> -->
                 <div id="currentCornerInfoContainer" class="inner"> <!-- 初始隐藏，由 JS 控制 -->
                     <!-- 显示当前弯道名称 (中文) -->
                     <div id="currentCornerNameCn" class="primary skew-n title-font"></div>
@@ -196,6 +178,13 @@
                     // .attr("stroke", ...) // 移除或注释掉
                     // .attr("stroke-width", ...) // 移除或注释掉，CSS 会控制
                     ;
+
+                cornerGroups
+                    .append("path")
+                    .attr("id", d => `${d.properties.id}-progress`) // 添加 -progress 后缀
+                    .attr("class", "town-progress") // 用于进度的类
+                    .attr("d", pathGenerator) // 使用 pathGenerator 生成路径
+                    .attr("fill", "none");
 
             }).catch(function (error) {
                 console.error("Error loading GeoJSON:", error);

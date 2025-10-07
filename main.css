@@ -42,6 +42,7 @@
   --body-font: fira, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, 'PingFang SC', sans-serif, Apple Color Emoji, Segoe UI Emoji;
 
   --full: 1905.97px;
+  /* --full: 100; */
 
   font-family: var(--body-font);
   color: var(--text1);
