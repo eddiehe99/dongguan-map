@@ -20,6 +20,7 @@
 
 ## References
 
+- [东莞市地理信息公共服务平台（DongGuan Platform for Common GeoSpatial Information Services）](https://guangdong.tianditu.gov.cn/dongguan/)
 - [rockyuse/svgmap](https://github.com/rockyuse/svgmap)
 - [Dongguan Map](https://zjj.dg.gov.cn/mware_cms/notice/dgmapIndex.gs)
 - [TangSY/echarts-map-demo](https://github.com/TangSY/echarts-map-demo)
