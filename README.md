@@ -11,8 +11,12 @@
 ## GeoJSON Resources
 
 - [东莞市 POI 数据](https://www.poi86.com/poi/amap/district/441900/1.html)
-- [iWun/china_geojson](https://github.com/iWun/china_geojson)
-- [mikedeng/city_geojson](https://github.com/mikedeng/city_geojson)
+- [zhangyu9609/echarts-mapJson](https://github.com/zhangyu9609/echarts-mapJson)
+
+## Overview and About
+
+- [东莞市人民政府](https://www.dg.gov.cn/)
+- [Districts & Townships of Dongguan](https://www.dongguantoday.com/about/districts/)
 
 ## References
 

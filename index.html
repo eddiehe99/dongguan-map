@@ -155,7 +155,7 @@
             const svg = d3.select("#svg-track");
 
             d3.json("441900.geojson").then(function (geojsonData) {
-                // console.log("GeoJSON loaded:", geojsonData);
+                console.log("GeoJSON loaded:", geojsonData);
 
                 const projection = d3.geoMercator()
                     .fitSize([660, 530], geojsonData);
