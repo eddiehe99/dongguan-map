@@ -369,10 +369,10 @@ function updateCornerDisplay() {
       moreEl.innerHTML = ''; // 注意：使用 innerHTML 有 XSS 风险，仅用于显示可信的 HTML
 
       // 根据当前语言和弯道数据更新内容
-      if (currentLang === 'cn' && currentCorner.ch) {
-        nameCnEl.textContent = currentCorner.ch;
-        // 处理动态类名 :class="currentCorner.ch == currentCorner.nk ? 'qt' : ''"
-        if (currentCorner.ch === currentCorner.nk) {
+      if (currentLang === 'cn' && currentCorner.cn) {
+        nameCnEl.textContent = currentCorner.cn;
+        // 处理动态类名 :class="currentCorner.cn == currentCorner.nk ? 'qt' : ''"
+        if (currentCorner.cn === currentCorner.nk) {
           nameCnEl.classList.add('qt');
         }
         // nameCnEl.style.display = 'block'; // 显示中文名
@@ -605,7 +605,7 @@ function updateCornerNamesDiv() {
       // 创建内部结构
       const innerDiv1 = document.createElement('div');
       const innerDiv2 = document.createElement('div');
-      innerDiv2.textContent = town.ch;
+      innerDiv2.textContent = town.cn;
       innerDiv1.appendChild(innerDiv2);
       element.appendChild(innerDiv1);
 
@@ -625,7 +625,7 @@ function updateCornerNamesDiv() {
     const currentLang = window.currentLang || 'cn';
     const textElement = element.querySelector('div div');
     if (textElement) {
-      textElement.textContent = currentLang === 'cn' ? town.ch : (town.en || town.ch);
+      textElement.textContent = currentLang === 'cn' ? town.cn : (town.en || town.cn);
     }
 
     // --- 修改此处的逻辑 ---
