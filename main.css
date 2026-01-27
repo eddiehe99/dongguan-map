@@ -385,14 +385,16 @@ body{
 .mid{
   position: absolute;
   left: 50%; top: 50%;
-  translate: -50% -50%;
+  transform: translate(-50%, -50%); /* 修正了 translate 语法 */
   z-index: 99999;
   opacity: 0;
+  pointer-events: none; /* 默认情况下，不响应鼠标事件 */
 }
 /* added by eddiehe99 */
 .mid.show{
   opacity: 1;
   transition: var(--transition);
+  pointer-events: auto; /* 显示时，响应鼠标事件 */
 }
 .msg{
   color: var(--text1);

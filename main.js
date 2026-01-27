@@ -348,10 +348,9 @@ function updateCornerDisplay() {
   const nameCnEl = document.getElementById('currentCornerNameCn');
   const nameEnEl = document.getElementById('currentCornerNameEn');
   const deSpan = document.getElementById('currentCornerDe');
-  const deTextEl = document.getElementById('currentCornerDeText');
   const moreEl = document.getElementById('currentCornerMore');
 
-  if (container && nameCnEl && nameEnEl && deSpan && deTextEl && moreEl) {
+  if (container && nameCnEl && nameEnEl && deSpan && moreEl) {
     if (showCorner && currentCorner) {
       // container.style.display = 'block'; // 显示容器
 
@@ -360,7 +359,6 @@ function updateCornerDisplay() {
       nameCnEl.className = 'primary skew-n title-font'; // 重置类名
       nameEnEl.textContent = '';
       nameEnEl.className = 'primary skew-n'; // 重置类名
-      deTextEl.textContent = '';
       deSpan.style.display = 'none'; // 默认隐藏德语
       moreEl.innerHTML = ''; // 注意：使用 innerHTML 有 XSS 风险，仅用于显示可信的 HTML
 
@@ -383,19 +381,14 @@ function updateCornerDisplay() {
         // nameEnEl.style.display = 'none'; // 隐藏英文名
       }
 
-      // 显示德语名称 (如果存在)
-      if (currentCorner.de) {
-        deTextEl.textContent = currentCorner.de;
-        // deSpan.style.display = 'inline'; // 显示德语 span (或 block，取决于布局)
-      }
-
       // 显示更多描述 (中文)
-      if (currentLang === 'cn' && currentCorner.more) {
-        moreEl.innerHTML = currentCorner.more; // 注意：使用 innerHTML 有 XSS 风险
+      if (currentLang === 'cn' && currentCorner.overview) {
+        moreEl.innerHTML = currentCorner.overview; // 注意：使用 innerHTML 有 XSS 风险
       }
 
     } else {
       // container.style.display = 'none'; // 隐藏整个容器
+      moreEl.innerHTML = '';
     }
   }
 }
