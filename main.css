@@ -387,6 +387,12 @@ body{
   left: 50%; top: 50%;
   translate: -50% -50%;
   z-index: 99999;
+  opacity: 0;
+}
+/* added by eddiehe99 */
+.mid.show{
+  opacity: 1;
+  transition: var(--transition);
 }
 .msg{
   color: var(--text1);

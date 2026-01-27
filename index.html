@@ -38,6 +38,8 @@
 <body>
     <!-- <div id="app" :class="[showAllCornerNames ? 'show-all-corners' : '', lang ]"> -->
     <div id="app">
+
+        <!-- GeoJson track -->
         <div class="track-map">
             <div class="inner">
                 <svg id="svg-track" viewBox="0 0 660 530" class="main-svg" width="6600px" height="5300px">
@@ -52,14 +54,44 @@
                 <div id="town-names-container">
                     <!-- 这里的弯道名称将由 D3.js 动态添加 -->
                 </div>
+
+                <!-- introMessage -->
+                <div class="mid" id="midDiv">
+                    <div class="msg" id="msgDiv">
+                        <div class="inner" id="innerDiv">
+                            <p class="title-font msg-title" data-lang="cn">东莞市地图</p>
+                            <p class="title-font msg-title" data-lang="en" style="display: none;">Dongguan Map</p>
+                            <p data-lang="cn"><a href="https://www.dg.gov.cn/zjdz/index.html" target="_blank">东莞市</a>
+                                因在广州之东，境内盛产莞草而得名。1988 年 1 月，东莞市升格为地级市，直属广东省管辖，下属有 4 个街道、28 个镇、2 个园区。1978
+                                年中国内地第一家“三来一补”企业太平手袋厂在此诞生，改革开放以来以制造产业立市，迅速发展为国际制造名城。
+                            </p>
+                            <p data-lang="en" style="display: none;">Since 1978, <a
+                                    href="https://www.dongguantoday.com/about/districts/" target="_blank">Dongguan</a> has
+                                quickly transformed itself from a bucolic farmland to “the world’s factory” featuring its
+                                prosperous manufacturing industry and coordinated urban-rural development.</p>
+                            <div class="indicator">
+                                <div data-lang="cn">向下滚动或点击镇街名查看地图</div>
+                                <div data-lang="en" style="display: none;">Scroll or click the district to start</div>
+                                <svg viewBox="0 0 100 100" class="scroll-arrow">
+                                    <path d="M10 20l40 30l40 -30" />
+                                    <path d="M10 60l40 30l40 -30" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- end of "inner" -->
             </div>
+            <!-- end of "track-map" -->
         </div>
+
         <div class="desc skew-p">
             <div class="logo">
                 <div class="inner skew-n">
                     <!-- <span id="logoTitleCn" class="title-font">纽<span>博格林</span>北<span>环</span>赛道地图</span> -->
                     <span id="logoTitleCn" class="title-font"><span>东莞市地图<span>（政区版）</span></span>
-                    <img src="https://s.anyway.red/nurburgring/logo.svg  " alt="纽北赛道地图" />
+                        <img src="https://s.anyway.red/nurburgring/logo.svg  " alt="纽北赛道地图" />
                 </div>
             </div>
             <div class="corner-info">
@@ -82,6 +114,7 @@
                     <!-- 显示弯道介绍 (中文) -->
                     <div id="currentCornerMore" class="more skew-n"></div>
                 </div>
+
                 <div id="endingMessageContainer" class="inner desc-msg" style="display: none;"> <!-- 初始隐藏 -->
                     <div id="endingMessage" class="ending skew-n">
                         The End
@@ -94,6 +127,7 @@
                 </div>
             </div>
 
+            <!-- footer -->
             <div class="controls">
                 <div class="inner skew-n">
                     <!-- <div @click="openModal('text')" role="button" class="link">
@@ -255,7 +289,7 @@
         // --- 关键：滚动事件监听器 ---
         // 监听滚动事件 (调用 main.js 中的函数)
         window.addEventListener('scroll', function () {
-            // console.log("Scroll event fired!"); // 可选：调试用
+            console.log("Scroll event fired!"); // 可选：调试用
 
             // 更新滚动条指示器 (如果需要)
             const scrollIndicator = document.getElementById('scrollIndicator');

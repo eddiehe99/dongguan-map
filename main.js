@@ -74,10 +74,6 @@ async function initApp() {
 
 document.addEventListener('DOMContentLoaded', initApp);
 
-// var d = new Vue({
-//   el: '#app',
-// })
-
 // --- 定义 openModal 函数 ---
 function openModal(type, img = null) {
     const modal = document.getElementById('modal');
@@ -404,6 +400,48 @@ function updateCornerDisplay() {
   }
 }
 
+function updateIntroMessageDisplay(progress) {
+    const container = document.getElementById('midDiv'); // 选择容器
+    if (!container) return; // 如果容器不存在，退出
+
+    // 检查滚动进度是否为 0
+    const shouldShow = progress === 0; // 模拟 Vue 的 v-if="p == 0"
+
+    // 控制整个容器的显示/隐藏
+    container.classList.toggle('show', shouldShow);
+    container.classList.toggle('hidden', !shouldShow);
+
+    // 如果容器是显示状态，则根据语言更新内部内容
+    // if (shouldShow) {
+    //     const currentLang = window.currentLang || 'cn';
+
+    //     // 选择所有带 lang-cn 类的元素
+    //     const cnElements = container.querySelectorAll('.lang-cn');
+    //     // 选择所有带 lang-en 类的元素
+    //     const enElements = container.querySelectorAll('.lang-en');
+
+    //     // 为当前语言的元素添加 active 类，为非当前语言的元素移除 active 类
+    //     cnElements.forEach(el => {
+    //         el.classList.toggle('active-cn', currentLang === 'cn');
+    //         // 如果需要，确保非活跃语言的类被移除（虽然 display: none; 会覆盖）
+    //         if (currentLang !== 'cn') {
+    //             el.classList.remove('active-cn');
+    //         }
+    //     });
+
+    //     enElements.forEach(el => {
+    //         el.classList.toggle('active-en', currentLang === 'en');
+    //         if (currentLang !== 'en') {
+    //             el.classList.remove('active-en');
+    //         }
+    //     });
+    // } else {
+    //     // 如果容器是隐藏的，确保内部元素的 active 类也被清除（可选，但更干净）
+    //     container.querySelectorAll('.lang-cn').forEach(el => el.classList.remove('active-cn'));
+    //     container.querySelectorAll('.lang-en').forEach(el => el.classList.remove('active-en'));
+    // }
+}
+
 // --- main.js 中的 updateScrollDistance 函数 ---
 function updateScrollDistance() {
   // 重置状态
@@ -428,6 +466,9 @@ function updateScrollDistance() {
       break; // 找到第一个匹配的就退出循环
     }
   }
+
+  // --- 新增：更新介绍消息的显示 ---
+  updateIntroMessageDisplay(currentP);
 
   // --- 关键：调用 updateCornerDisplay 来更新显示 ---
   updateCornerDisplay();
@@ -536,7 +577,7 @@ function updateEndingDisplay(progress) {
         enTextElement.style.display = '';
       }
     } else {
-      // container.style.display = 'none'; // 隐藏整个容器
+      container.style.display = 'none'; // 隐藏整个容器
     }
   }
 }
