@@ -6,8 +6,8 @@ if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').match
 }
 
 let currentP = 0.0; // 滚动进度
-let mX= 0.0;
-let mY= 0.0;
+let mX = 0.0;
+let mY = 0.0;
 let currentLang = window.lang || 'cn'; // 语言，从 index.html 获取
 let showModal = false; // 模态框显示状态
 let showAllCornerNames = false; // 显示所有弯道名称
@@ -20,8 +20,9 @@ let cornerStart = 0; // 当前弯道开始位置
 let cornerEnd = 0; // 当前弯道结束位置
 let sectionStart = 0; // 当前路段开始位置
 let sectionEnd = 0; // 当前路段结束位置
+let previousCurrentCornerId = null; // 存储上一个 currentCorner 的 id
 
-let aboutContent = 
+let aboutContent =
   "网页设计 & 开发：<a href='https://www.eddiehe.top/' target='_blank'>Eddie He</a><br/><br/>\n" +
   "<strong>参考信息:</strong><br/>\n" +
   "· <a target='_blank' href='https://jjying.com/nurburgring/'>Nürburgring Map</a><br/><br/>\n" +
@@ -75,78 +76,134 @@ async function initApp() {
 document.addEventListener('DOMContentLoaded', initApp);
 
 // --- 定义 openModal 函数 ---
+// function openModal(type, img = null) {
+//   const modal = document.getElementById('modal');
+//   const modalBody = document.getElementById('modal-body');
+
+//   if (modal && modalBody) {
+//     // 清空之前的内容
+//     modalBody.innerHTML = '';
+
+//     if (type === 'text') {
+//       // 设置文本内容
+//       modalBody.innerHTML = aboutContent; // 使用上面定义的常量
+//     } else if (type === 'image' && img) {
+//       // 设置图片内容
+//       // 注意：移除了 URL 中的多余空格
+//       // let imgHtml = `<img src='https://s.anyway.red/nurburgring/${img.src}!/quality/80/progressive/true/ignore-error/true'/>`;
+//       let imgHtml = `<img src='${img.url}'/>`;
+//       if (img.url && img.author) {
+//         imgHtml += `<div class='source-in-modal'>@<a href='${img.url}' target='_blank'>${img.author}</a></div>`;
+//       }
+//       modalBody.innerHTML = imgHtml;
+//     }
+
+//     // 显示模态框
+//     modal.classList.add('show');
+//     // 如果需要，可以设置一个全局变量来跟踪模态框状态
+//     // window.showModal = true;
+//   } else {
+//     console.error("Modal or modal-body element not found.");
+//   }
+// }
+
 function openModal(type, img = null) {
-    const modal = document.getElementById('modal');
-    const modalBody = document.getElementById('modal-body');
+  
+  let modal, modalBody;
 
-    if (modal && modalBody) {
-        // 清空之前的内容
-        modalBody.innerHTML = '';
+  if (type === 'text') {
+    modal = document.getElementById('text-modal');
+    modalBody = document.getElementById('text-modal-body');
+  } else if (type === 'image' && img) {
+    modal = document.getElementById('image-modal');
+    modalBody = document.getElementById('image-modal-body');
+    
+  } else {
+    console.error("Invalid modal type or missing image data for image type.");
+    return;
+  }
 
-        if (type === 'text') {
-            // 设置文本内容
-            modalBody.innerHTML = aboutContent; // 使用上面定义的常量
-        } else if (type === 'image' && img) {
-            // 设置图片内容
-            // 注意：移除了 URL 中的多余空格
-            let imgHtml = `<img src='https://s.anyway.red/nurburgring/${img.src}!/quality/80/progressive/true/ignore-error/true'/>`;
-            if (img.url && img.author) {
-                imgHtml += `<div class='source-in-modal'>@<a href='${img.url}' target='_blank'>${img.author}</a></div>`;
-            }
-            modalBody.innerHTML = imgHtml;
-        }
+  if (modal && modalBody) {
+    modalBody.innerHTML = ''; // 清空之前的内容
+    console.log("openModal called with type:", type, "and img:", img);
 
-        // 显示模态框
-        modal.classList.add('show');
-        // 如果需要，可以设置一个全局变量来跟踪模态框状态
-        // window.showModal = true;
-    } else {
-        console.error("Modal or modal-body element not found.");
+    if (type === 'text') {
+      modalBody.innerHTML = aboutContent;
+    } else if (type === 'image' && img) {
+      let imgHtml = `<img src='${img.url}'/>`;
+      if (img.url && img.author) {
+        imgHtml += `<div class='source-in-modal'>@<a href='${img.url}' target='_blank'>${img.author}</a></div>`;
+      }
+      modalBody.innerHTML = imgHtml;
     }
+
+    // 显示对应的模态框
+    // modal.style.display = 'block';
+    // 或者使用 classList.add('show') 如果 CSS 定义了 .modal.show
+    modal.classList.add('show');
+  } else {
+    console.error("Modal or modal-body element not found for type:", type);
+  }
 }
 
 // --- 定义 closeModal 函数 ---
-function closeModal() {
-    const modal = document.getElementById('modal');
-    if (modal) {
-        modal.classList.remove('show');
-        // window.showModal = false;
+// function closeModal() {
+//   const modal = document.getElementById('modal');
+//   if (modal) {
+//     modal.classList.remove('show');
+//     // window.showModal = false;
+//   } else {
+//     console.error("Modal element not found for closing.");
+//   }
+// }
+
+// --- 修改 closeModal 函数 ---
+function closeModal(modalElement) {
+    // 传入被点击的模态框元素本身
+    if (modalElement && modalElement.classList.contains('modal')) {
+        // modalElement.style.display = 'none';
+        modalElement.classList.remove('show'); // 如果使用 class
     } else {
-        console.error("Modal element not found for closing.");
+        // 如果没有传入元素，或者你想一次性关闭所有模态框
+        // document.getElementById('text-modal').style.display = 'none';
+        // document.getElementById('image-modal').style.display = 'none';
+        // 或者移除 class
+        document.getElementById('text-modal').classList.remove('show');
+        document.getElementById('image-modal').classList.remove('show');
     }
 }
 
 // --- 定义 innerModal 函数 (防止点击内容区域关闭模态框) ---
 function innerModal(event) {
-    // 这个函数的目的是阻止事件冒泡到模态框背景 (modal)，从而不触发关闭
-    // 在 HTML 中已经通过 onclick="innerModal(event)" 绑定
-    event.stopPropagation();
+  // 这个函数的目的是阻止事件冒泡到模态框背景 (modal)，从而不触发关闭
+  // 在 HTML 中已经通过 onclick="innerModal(event)" 绑定
+  event.stopPropagation();
 }
 
 // --- 为模态框背景添加点击关闭功能 (在 DOM 加载完成后) ---
 document.addEventListener('DOMContentLoaded', function () {
-    const modal = document.getElementById('modal');
-    if (modal) {
-        // 当点击模态框背景 (非内容区域) 时，关闭模态框
-        modal.addEventListener('click', function(event) {
-            // 如果点击的是模态框背景 (modal 元素本身，而不是其子元素 .modal-content)
-            if (event.target === modal) {
-                closeModal();
-            }
-        });
-    }
+  const modal = document.getElementById('modal');
+  if (modal) {
+    // 当点击模态框背景 (非内容区域) 时，关闭模态框
+    modal.addEventListener('click', function (event) {
+      // 如果点击的是模态框背景 (modal 元素本身，而不是其子元素 .modal-content)
+      if (event.target === modal) {
+        closeModal();
+      }
+    });
+  }
 
-    // ... (之前的其他 DOMContentLoaded 内的事件监听器绑定代码) ...
-    const aboutLinkElement = document.getElementById('aboutLinkText');
-    if (aboutLinkElement) {
-        // 假设 openModal 函数已经定义并且暴露在 window 对象上
-        aboutLinkElement.addEventListener('click', function () {
-            window.openModal('text'); // 调用 main.js 中定义的 openModal 函数，传入 'text' 类型
-            // console.log("'About' link clicked, modal should open.")
-        });
-    } else {
-        console.warn("About link element with ID 'aboutLinkText' not found.");
-    }
+  // ... (之前的其他 DOMContentLoaded 内的事件监听器绑定代码) ...
+  const aboutLinkElement = document.getElementById('aboutLinkText');
+  if (aboutLinkElement) {
+    // 假设 openModal 函数已经定义并且暴露在 window 对象上
+    aboutLinkElement.addEventListener('click', function () {
+      window.openModal('text'); // 调用 main.js 中定义的 openModal 函数，传入 'text' 类型
+      // console.log("'About' link clicked, modal should open.")
+    });
+  } else {
+    console.warn("About link element with ID 'aboutLinkText' not found.");
+  }
 });
 
 // --- 将函数暴露到全局作用域，以便 HTML onclick 属性可以调用 ---
@@ -349,90 +406,152 @@ function updateCornerDisplay() {
   const nameEnEl = document.getElementById('currentCornerNameEn');
   const deSpan = document.getElementById('currentCornerDe');
   const moreEl = document.getElementById('currentCornerMore');
+  // 获取 thumbs 容器
+  const thumbsContainer = document.getElementById('thumbsContainer');
 
-  if (container && nameCnEl && nameEnEl && deSpan && moreEl) {
-    if (showCorner && currentCorner) {
-      // container.style.display = 'block'; // 显示容器
+  if (container && nameCnEl && nameEnEl && deSpan && moreEl && thumbsContainer) {
+    const currentCornerId = (showCorner && currentCorner) ? currentCorner.id : null;
+    if (currentCornerId !== previousCurrentCornerId) {
+      // Update the stored ID
+        previousCurrentCornerId = currentCornerId;
 
-      // 清空内容
-      nameCnEl.textContent = '';
-      nameCnEl.className = 'primary skew-n title-font'; // 重置类名
-      nameEnEl.textContent = '';
-      nameEnEl.className = 'primary skew-n'; // 重置类名
-      deSpan.style.display = 'none'; // 默认隐藏德语
-      moreEl.innerHTML = ''; // 注意：使用 innerHTML 有 XSS 风险，仅用于显示可信的 HTML
+        // 2. 清空 *所有* 相关容器内容 (清理旧状态) - 最佳位置
+        nameCnEl.textContent = '';
+        nameCnEl.className = 'primary skew-n title-font'; // 重置类名
+        nameEnEl.textContent = '';
+        nameEnEl.className = 'primary skew-n'; // 重置类名
+        deSpan.style.display = 'none'; // 默认隐藏德语
+        moreEl.innerHTML = ''; // 注意：使用 innerHTML 有 XSS 风险，仅用于显示可信的 HTML
+        thumbsContainer.innerHTML = ''; // 清空缩略图内容
+        thumbsContainer.classList.add('hidden-area'); // 默认隐藏 thumbs 容器
 
-      // 根据当前语言和弯道数据更新内容
-      if (currentLang === 'cn' && currentCorner.cn) {
-        nameCnEl.textContent = currentCorner.cn;
-        // 处理动态类名 :class="currentCorner.cn == currentCorner.nk ? 'qt' : ''"
-        if (currentCorner.cn === currentCorner.nk) {
-          nameCnEl.classList.add('qt');
+      if (showCorner && currentCorner) {
+        // container.style.display = 'block'; // 显示容器
+
+        // 根据当前语言和弯道数据更新内容
+        if (currentLang === 'cn' && currentCorner.town_name_cn) {
+          nameCnEl.textContent = currentCorner.town_name_cn;
+        } else {
+          // nameCnEl.style.display = 'none'; // 隐藏中文名
         }
-        // nameCnEl.style.display = 'block'; // 显示中文名
+
+        if (currentLang === 'en' && currentCorner.town_name_en) {
+          nameEnEl.textContent = currentCorner.town_name_en;
+          // nameEnEl.style.display = 'block'; // 显示英文名
+        } else {
+          // nameEnEl.style.display = 'none'; // 隐藏英文名
+        }
+
+        // 显示更多描述 (中文)
+        if (currentLang === 'cn' && currentCorner.about_cn) {
+          moreEl.innerHTML = currentCorner.about_cn; // 注意：使用 innerHTML 有 XSS 风险
+        } else if (currentLang === 'en' && currentCorner.about_en) {
+          moreEl.innerHTML = currentCorner.about_en; // 注意：使用 innerHTML 有 XSS 风险
+        }
+
+        // --- 新增：显示缩略图 ---
+        // 检查 currentCorner.imgs 是否存在且为数组
+        if (currentCorner.imgs && Array.isArray(currentCorner.imgs) && currentCorner.imgs.length > 0) {
+          // 遍历 imgs 数组
+          currentCorner.imgs.forEach(imgObj => {
+            // 创建 thumb 容器 div
+            const thumbDiv = document.createElement('div');
+            thumbDiv.className = 'thumb'; // 添加基础类名
+
+            // 如果 img.url 存在，添加 'has-author' 类
+            if (imgObj.url) {
+              thumbDiv.classList.add('has-author');
+            }
+
+            // 创建 img 元素
+            const imgElement = document.createElement('img');
+            // 构建图片 URL (注意移除 URL 中的多余空格)
+            imgElement.src = imgObj.url;
+            imgElement.className = 'skew-n';
+            imgElement.loading = 'lazy'; // 设置懒加载
+
+            // 为图片添加点击事件
+            imgElement.addEventListener('click', () => {
+              // 调用 openModal 函数，传入 'image' 类型和当前的 img 对象
+              window.openModal('image', imgObj);
+            });
+
+            // 将 img 元素添加到 thumb 容器
+            thumbDiv.appendChild(imgElement);
+
+            // 如果 img.url 存在，创建并添加 source 链接
+            if (imgObj.url) {
+              const sourceLink = document.createElement('a');
+              sourceLink.href = imgObj.url;
+              sourceLink.target = '_blank';
+              sourceLink.title = '查看照片来源'; // 设置链接标题
+              sourceLink.className = 'thumb-source';
+
+              const authorSpan = document.createElement('span');
+              authorSpan.className = 'skew-n';
+              authorSpan.textContent = imgObj.author; // 设置作者名称
+
+              sourceLink.appendChild(authorSpan);
+              thumbDiv.appendChild(sourceLink); // 将链接添加到 thumb 容器
+            }
+
+            // 将整个 thumb 容器添加到 thumbsContainer
+            thumbsContainer.appendChild(thumbDiv);
+          });
+
+          // 所有缩略图添加完毕后，显示 thumbsContainer
+          thumbsContainer.classList.remove('hidden-area'); // 移除隐藏类
+        }
+        // --- End 新增 ---
+
       } else {
-        // nameCnEl.style.display = 'none'; // 隐藏中文名
+        // container.style.display = 'none'; // 隐藏整个容器
+        moreEl.innerHTML = '';
       }
-
-      if (currentLang === 'en' && currentCorner.en) {
-        nameEnEl.textContent = currentCorner.en;
-        // nameEnEl.style.display = 'block'; // 显示英文名
-      } else {
-        // nameEnEl.style.display = 'none'; // 隐藏英文名
-      }
-
-      // 显示更多描述 (中文)
-      if (currentLang === 'cn' && currentCorner.overview) {
-        moreEl.innerHTML = currentCorner.overview; // 注意：使用 innerHTML 有 XSS 风险
-      }
-
-    } else {
-      // container.style.display = 'none'; // 隐藏整个容器
-      moreEl.innerHTML = '';
     }
   }
 }
 
 function updateIntroMessageDisplay(progress) {
-    const container = document.getElementById('midDiv'); // 选择容器
-    if (!container) return; // 如果容器不存在，退出
+  const container = document.getElementById('midDiv'); // 选择容器
+  if (!container) return; // 如果容器不存在，退出
 
-    // 检查滚动进度是否为 0
-    const shouldShow = progress === 0; // 模拟 Vue 的 v-if="p == 0"
+  // 检查滚动进度是否为 0
+  const shouldShow = progress === 0; // 模拟 Vue 的 v-if="p == 0"
 
-    // 控制整个容器的显示/隐藏
-    container.classList.toggle('show', shouldShow);
-    container.classList.toggle('hidden', !shouldShow);
+  // 控制整个容器的显示/隐藏
+  container.classList.toggle('show', shouldShow);
+  container.classList.toggle('hidden', !shouldShow);
 
-    // 如果容器是显示状态，则根据语言更新内部内容
-    // if (shouldShow) {
-    //     const currentLang = window.currentLang || 'cn';
+  // 如果容器是显示状态，则根据语言更新内部内容
+  // if (shouldShow) {
+  //     const currentLang = window.currentLang || 'cn';
 
-    //     // 选择所有带 lang-cn 类的元素
-    //     const cnElements = container.querySelectorAll('.lang-cn');
-    //     // 选择所有带 lang-en 类的元素
-    //     const enElements = container.querySelectorAll('.lang-en');
+  //     // 选择所有带 lang-cn 类的元素
+  //     const cnElements = container.querySelectorAll('.lang-cn');
+  //     // 选择所有带 lang-en 类的元素
+  //     const enElements = container.querySelectorAll('.lang-en');
 
-    //     // 为当前语言的元素添加 active 类，为非当前语言的元素移除 active 类
-    //     cnElements.forEach(el => {
-    //         el.classList.toggle('active-cn', currentLang === 'cn');
-    //         // 如果需要，确保非活跃语言的类被移除（虽然 display: none; 会覆盖）
-    //         if (currentLang !== 'cn') {
-    //             el.classList.remove('active-cn');
-    //         }
-    //     });
+  //     // 为当前语言的元素添加 active 类，为非当前语言的元素移除 active 类
+  //     cnElements.forEach(el => {
+  //         el.classList.toggle('active-cn', currentLang === 'cn');
+  //         // 如果需要，确保非活跃语言的类被移除（虽然 display: none; 会覆盖）
+  //         if (currentLang !== 'cn') {
+  //             el.classList.remove('active-cn');
+  //         }
+  //     });
 
-    //     enElements.forEach(el => {
-    //         el.classList.toggle('active-en', currentLang === 'en');
-    //         if (currentLang !== 'en') {
-    //             el.classList.remove('active-en');
-    //         }
-    //     });
-    // } else {
-    //     // 如果容器是隐藏的，确保内部元素的 active 类也被清除（可选，但更干净）
-    //     container.querySelectorAll('.lang-cn').forEach(el => el.classList.remove('active-cn'));
-    //     container.querySelectorAll('.lang-en').forEach(el => el.classList.remove('active-en'));
-    // }
+  //     enElements.forEach(el => {
+  //         el.classList.toggle('active-en', currentLang === 'en');
+  //         if (currentLang !== 'en') {
+  //             el.classList.remove('active-en');
+  //         }
+  //     });
+  // } else {
+  //     // 如果容器是隐藏的，确保内部元素的 active 类也被清除（可选，但更干净）
+  //     container.querySelectorAll('.lang-cn').forEach(el => el.classList.remove('active-cn'));
+  //     container.querySelectorAll('.lang-en').forEach(el => el.classList.remove('active-en'));
+  // }
 }
 
 // --- main.js 中的 updateScrollDistance 函数 ---
@@ -558,7 +677,7 @@ function updateEndingDisplay(progress) {
 
   if (container && startOverBtn && cnTextElement && enTextElement) {
     // 检查滚动进度是否接近 1 (模拟 Vue 的 v-if="p > 0.999")
-    if (progress > 0.9625) {
+    if (progress > 0.98) {
       container.style.display = ''; // 显示整个容器
 
       // 根据当前语言显示按钮文本 (模拟 Vue 的 v-if="lang == 'cn'" 和 v-if="lang == 'en'")
@@ -639,7 +758,7 @@ function updateCornerNamesDiv() {
       // 创建内部结构
       const innerDiv1 = document.createElement('div');
       const innerDiv2 = document.createElement('div');
-      innerDiv2.textContent = town.cn;
+      innerDiv2.textContent = town.town_name_cn;
       innerDiv1.appendChild(innerDiv2);
       element.appendChild(innerDiv1);
 
@@ -659,7 +778,7 @@ function updateCornerNamesDiv() {
     const currentLang = window.currentLang || 'cn';
     const textElement = element.querySelector('div div');
     if (textElement) {
-      textElement.textContent = currentLang === 'cn' ? town.cn : (town.en || town.cn);
+      textElement.textContent = currentLang === 'cn' ? town.town_name_cn : (town.town_name_en || town.town_name_cn);
     }
 
     // --- 修改此处的逻辑 ---

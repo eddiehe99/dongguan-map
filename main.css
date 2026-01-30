@@ -394,7 +394,8 @@ body{
 .mid.show{
   opacity: 1;
   transition: var(--transition);
-  pointer-events: auto; /* 显示时，响应鼠标事件 */
+  pointer-events: none; /* 默认情况下，不响应鼠标事件 */
+  /* pointer-events: auto; 显示时，响应鼠标事件 */
 }
 .msg{
   color: var(--text1);
@@ -654,6 +655,11 @@ body{
   #app.en &{
     font-weight: 400;
   }  
+}
+
+/* 隐藏区域类 (用于替代 v-cloak 或控制显示/隐藏) */
+.hidden-area {
+    display: none;
 }
 
 .thumbs{
