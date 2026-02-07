@@ -14,13 +14,15 @@
     <meta property="og:type" content="website">
     <meta property="og:title" content="东莞市地图">
     <meta property="og:description" content="可交互的东莞市地图（政区版），展示了众多镇街的介绍。">
-    <meta property="og:image" content="https://mediabluk.cnr.cn/img/cnr/CNRCDP/2023/0329/93b209062fcb7168004450043444138810.jpg">
+    <meta property="og:image"
+        content="https://mediabluk.cnr.cn/img/cnr/CNRCDP/2023/0329/93b209062fcb7168004450043444138810.jpg">
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="东莞市地图" />
     <meta name="twitter:description" content="可交互的东莞市地图（政区版），展示了众多镇街的介绍。" />
     <meta name="twitter:site" content="@eddiehe99" />
-    <meta name="twitter:image" content="https://mediabluk.cnr.cn/img/cnr/CNRCDP/2023/0329/93b209062fcb7168004450043444138810.jpg" />
+    <meta name="twitter:image"
+        content="https://mediabluk.cnr.cn/img/cnr/CNRCDP/2023/0329/93b209062fcb7168004450043444138810.jpg" />
 
     <!-- <link rel="preconnect" href="https://s.anyway.red">
     <link rel="preconnect" href="https://anyway.fm"> -->
@@ -28,11 +30,6 @@
 
     <!-- <link rel="stylesheet" href="https://s.anyway.red/nurburgring/sm/result.css" /> -->
     <link rel="icon" href="https://www.dg.gov.cn/images/dglogo.png">
-
-    <script>
-        let lang = 'cn'
-    </script>
-
 </head>
 
 <body>
@@ -92,8 +89,8 @@
         <div class="desc skew-p">
             <div class="logo">
                 <div class="inner skew-n">
-                    <!-- <span id="logoTitleCn" class="title-font">纽<span>博格林</span>北<span>环</span>赛道地图</span> -->
-                    <span id="logoTitleCn" class="title-font"><span>东莞市地图<span>（政区版）</span></span>
+                    <!-- <span id="logoTitle" class="title-font">纽<span>博格林</span>北<span>环</span>赛道地图</span> -->
+                    <span id="logoTitle" class="title-font"><span>东莞市地图（政区版）</span>
                         <!-- <img src="https://s.anyway.red/nurburgring/logo.svg  " alt="纽北赛道地图" /> -->
                 </div>
             </div>
@@ -101,12 +98,10 @@
             <!-- I don't want to modify the `.css` file written by JJ Ying. -->
             <div class="corner-info">
                 <div id="currentTownInfoContainer" class="inner"> <!-- 初始隐藏，由 JS 控制 -->
-                    <!-- 显示当前弯道名称 (中文) -->
-                    <div id="currentTownNameCn" class="primary skew-n title-font"></div>
-                    <!-- 显示当前弯道名称 (英文) -->
-                    <div id="currentTownNameEn" class="primary skew-n"></div>
-                    <!-- 显示弯道介绍 (中文) -->
-                    <div id="currentCornerAbout" class="more skew-n"></div>
+                    <!-- 显示当前镇街名称  -->
+                    <div id="currentTownName" class="primary skew-n title-font"></div>
+                    <!-- 显示镇街介绍 -->
+                    <div id="currentTownAbout" class="more skew-n"></div>
                 </div>
 
                 <div id="endingMessageContainer" class="inner desc-msg" style="display: none;"> <!-- 初始隐藏 -->
@@ -115,7 +110,8 @@
                         <div id="startOverBtn" class='btn skew-p'>
                             <!-- 为不同语言准备按钮文本元素 -->
                             <div id="startOverBtnTextCn" class='skew-n title-font' data-lang="cn">回到起点</div>
-                            <div id="startOverBtnTextEn" class='skew-n' data-lang="en" style="display: none;">Start Over</div>
+                            <div id="startOverBtnTextEn" class='skew-n' data-lang="en" style="display: none;">Start Over
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -191,7 +187,7 @@
             </div>
         </div>
 
-    <!-- end of app div -->
+        <!-- end of app div -->
     </div>
 
     <script src="main.js"></script>
@@ -297,7 +293,7 @@
             // --- 初始化 UI (调用 main.js 中的函数) ---
             DongguanMapApp.updateUIBasedOnLanguage(window.currentLang || 'cn');
             DongguanMapApp.updateUIBasedOnDarkMode(window.isDarkMode || true);
-            DongguanMapApp.updateTownNamesDiv(); 
+            DongguanMapApp.updateTownNamesDiv();
         });
 
         // --- 关键：滚动事件监听器 ---

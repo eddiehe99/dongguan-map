@@ -15,14 +15,14 @@ const DongguanMapApp = (function () {
   let mY = 0.0;
 
   // app state
-  let currentLang = window.lang || 'cn'; // 语言，从 index.html 获取
+  let currentLang = 'cn'; // 
   let showModal = false; // 模态框显示状态
   let isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; // 深色模式
 
   // state related to town display
   let towns = [];
   let currentTown = null;
-  let showTown = false;
+  let showTown = true;
   let previousCurrentTownId = null; // 存储上一个 currentTown 的 id
 
   // scroll-related state for SVG highlighting
@@ -172,10 +172,10 @@ const DongguanMapApp = (function () {
 
     // d. 更新其他依赖语言的内容 (如果有的话)
     // 例如，更新 Logo 标题 (假设 HTML 结构允许)
-    const logoTitleElement = document.querySelector('.desc .logo .inner .title-font');
+    const logoTitleElement = document.getElementById('logoTitle');
     if (logoTitleElement) {
       // 注意：这里直接替换整个 innerHTML，如果结构复杂可能需要更精细的操作
-      logoTitleElement.innerHTML = lang === 'cn' ? '东莞市地图<span>（政区版）</span>' : 'Dongguan Map';
+      logoTitleElement.innerHTML = lang === 'cn' ? '东莞市地图（政区版）' : 'Dongguan Map';
     }
 
     // e. 更新其他控制按钮的文本 (如果 HTML 中给它们加了 id)
@@ -197,9 +197,16 @@ const DongguanMapApp = (function () {
       currentLang = "en";
     }
 
+    window.currentLang = currentLang;
+    window.lang = currentLang;
+
     console.log("Language toggled to:", currentLang); // 可选：调试用
 
     updateUIBasedOnLanguage(currentLang);
+
+    updateTownIntroduction();
+
+    updateTownNamesDiv();
   }
 
 
@@ -239,40 +246,34 @@ const DongguanMapApp = (function () {
 
   function updateTownIntroduction() {
     const container = document.getElementById('currentTownInfoContainer');
-    const nameCnEl = document.getElementById('currentTownNameCn');
-    const nameEnEl = document.getElementById('currentTownNameEn');
-    const moreEl = document.getElementById('currentCornerAbout');
+    const nameEl = document.getElementById('currentTownName');
+    const moreEl = document.getElementById('currentTownAbout');
     // 获取 thumbs 容器
     const thumbsContainer = document.getElementById('thumbsContainer');
 
-    if (container && nameCnEl && nameEnEl && moreEl && thumbsContainer) {
+    if (container && nameEl && moreEl && thumbsContainer) {
       const currentCornerId = (showTown && currentTown) ? currentTown.id : null;
-      if (currentCornerId !== previousCurrentTownId) {
+      const needsUpdate = (currentCornerId !== previousCurrentTownId) ||
+        (currentCornerId !== null && previousLang !== currentLang);
+      if (needsUpdate) {
         // Update the stored ID
         previousCurrentTownId = currentCornerId;
+        previousLang = currentLang;  // 记录当前语言
 
         // 2. 清空 *所有* 相关容器内容 (清理旧状态) - 最佳位置
-        nameCnEl.textContent = '';
-        nameCnEl.className = 'primary skew-n title-font'; // 重置类名
-        nameEnEl.textContent = '';
-        nameEnEl.className = 'primary skew-n'; // 重置类名
+        nameEl.textContent = '';
+        nameEl.className = 'primary skew-n title-font'; // 重置类名
         moreEl.innerHTML = ''; // 注意：使用 innerHTML 有 XSS 风险，仅用于显示可信的 HTML
         thumbsContainer.innerHTML = ''; // 清空缩略图内容
         thumbsContainer.classList.add('hidden-area'); // 默认隐藏 thumbs 容器
 
         if (showTown && currentTown) {
-          // 根据当前语言和弯道数据更新内容
           if (currentLang === 'cn' && currentTown.town_name_cn) {
-            nameCnEl.textContent = currentTown.town_name_cn;
-          } else {
-            // nameCnEl.style.display = 'none'; // 隐藏中文名
-          }
-
-          if (currentLang === 'en' && currentTown.town_name_en) {
-            nameEnEl.textContent = currentTown.town_name_en;
-            // nameEnEl.style.display = 'block'; // 显示英文名
-          } else {
-            // nameEnEl.style.display = 'none'; // 隐藏英文名
+            nameEl.textContent = currentTown.town_name_cn;
+            nameEl.classList.add('title-font');
+          } else if (currentLang === 'en' && currentTown.town_name_en) {
+            nameEl.textContent = currentTown.town_name_en;
+            nameEl.classList.remove('title-font');
           }
 
           // 显示更多描述 (中文)
@@ -335,7 +336,6 @@ const DongguanMapApp = (function () {
             // 所有缩略图添加完毕后，显示 thumbsContainer
             thumbsContainer.classList.remove('hidden-area'); // 移除隐藏类
           }
-          // --- End 新增 ---
 
         } else {
           // container.style.display = 'none'; // 隐藏整个容器
@@ -459,8 +459,8 @@ const DongguanMapApp = (function () {
 
   function updateScrollDistance() {
     // 重置状态
-    showTown = false;
-    currentTown = null;
+    // showTown = false;
+    // currentTown = null;
 
     // 计算当前滚动进度
     const progress = window.scrollY / (body.scrollHeight - window.innerHeight);
@@ -584,7 +584,6 @@ const DongguanMapApp = (function () {
       }
 
       // 更新文本内容
-      const currentLang = window.currentLang || 'cn';
       const textElement = element.querySelector('div div');
       if (textElement) {
         textElement.textContent = currentLang === 'cn' ? town.town_name_cn : (town.town_name_en || town.town_name_cn);
