@@ -114,8 +114,8 @@
                         The End
                         <div id="startOverBtn" class='btn skew-p'>
                             <!-- 为不同语言准备按钮文本元素 -->
-                            <div id="startOverBtnTextCn" class='skew-n title-font'>回到起点</div>
-                            <div id="startOverBtnTextEn" class='skew-n' style="display: none;">Start Over</div>
+                            <div id="startOverBtnTextCn" class='skew-n title-font' data-lang="cn">回到起点</div>
+                            <div id="startOverBtnTextEn" class='skew-n' data-lang="en" style="display: none;">Start Over</div>
                         </div>
                     </div>
                 </div>
@@ -155,11 +155,11 @@
         <!-- id 用于 JS 选择和控制显示/隐藏 -->
         <!-- class 包含 modal 基础样式和 text 类型标识 -->
         <!-- onclick="closeModal()" 绑定点击背景关闭事件 -->
-        <div id="text-modal" class="modal text" onclick="closeModal(this)">
+        <div id="text-modal" class="modal text" onclick="DongguanMapApp.closeModal(this)">
             <!-- 模态框内容区域 -->
             <!-- class 包含 inner 基础样式 -->
             <!-- onclick="innerModal(event)" 阻止点击内容区域时事件冒泡到背景，防止关闭 -->
-            <div class="inner" onclick="innerModal(event)">
+            <div class="inner" onclick="DongguanMapApp.innerModal(event)">
                 <!-- 模态框内容体 -->
                 <!-- id 用于 JS 动态插入内容 -->
                 <!-- class 包含 modal-content 基础样式和 skew-n 变形样式 -->
@@ -168,7 +168,7 @@
                 <!-- 模态框关闭按钮 -->
                 <!-- class 包含 modal-close 基础样式和 skew-n 变形样式 -->
                 <!-- onclick="closeModal()" 绑定点击关闭事件 -->
-                <div class="modal-close skew-n" onclick="closeModal(this)">
+                <div class="modal-close skew-n" onclick="DongguanMapApp.closeModal(this)">
                     <!-- 关闭按钮 SVG 图标 -->
                     <svg viewBox="0 0 30 30">
                         <circle cx="15" cy="15" r="12" />
@@ -179,10 +179,10 @@
         </div>
 
         <!-- 图片模态框 -->
-        <div id="image-modal" class="modal image" onclick="closeModal(this)">
-            <div class="inner" onclick="innerModal(event)">
+        <div id="image-modal" class="modal image" onclick="DongguanMapApp.closeModal(this)">
+            <div class="inner" onclick="DongguanMapApp.innerModal(event)">
                 <div id="image-modal-body" class="modal-content skew-n"></div>
-                <div class="modal-close skew-n" onclick="closeModal(this)">
+                <div class="modal-close skew-n" onclick="DongguanMapApp.closeModal(this)">
                     <svg viewBox="0 0 30 30">
                         <circle cx="15" cy="15" r="12" />
                         <path d="M10 10L20 20M20 10L10 20" />
@@ -280,9 +280,8 @@
             }).finally(function () {
                 // --- 关键：在 D3.js Promise 完成（无论成功或失败）后，调用 updateTownNamesDiv ---
                 // 确保 main.js 中的 updateTownNamesDiv 函数已定义且 window.featureCentroids 已设置
-                if (window.updateTownNamesDiv && window.featureCentroids) {
-                    // console.log("Calling updateTownNamesDiv after GeoJSON load.");
-                    window.updateTownNamesDiv(); // 调用 main.js 中的函数
+                if (typeof DongguanMapApp.updateTownNamesDiv === 'function' && window.featureCentroids) {
+                    DongguanMapApp.updateTownNamesDiv(); // 调用 main.js 中的函数
                 } else {
                     console.error("updateTownNamesDiv function or featureCentroids not available.");
                 }
@@ -290,21 +289,21 @@
 
             // --- 为按钮添加事件监听器 (调用 main.js 中定义的函数) ---
             // 确保 main.js 已经执行并定义了这些函数
-            document.getElementById('langToggleGroup')?.addEventListener('click', window.toggleLang);
-            document.getElementById('darkModeToggleGroup')?.addEventListener('click', window.toggleDarkMode);
-            document.getElementById('startOverBtn')?.addEventListener('click', function () { window.setP(0.001); });
-            document.getElementById('aboutLinkText')?.addEventListener('click', function () { window.openModal('text'); });
+            document.getElementById('langToggleGroup')?.addEventListener('click', DongguanMapApp.toggleLang);
+            document.getElementById('darkModeToggleGroup')?.addEventListener('click', DongguanMapApp.toggleDarkMode);
+            document.getElementById('startOverBtn')?.addEventListener('click', function () { DongguanMapApp.setP(0.001); });
+            document.getElementById('aboutLinkText')?.addEventListener('click', function () { DongguanMapApp.openModal('text'); });
 
             // --- 初始化 UI (调用 main.js 中的函数) ---
-            window.updateUIBasedOnLanguage(window.currentLang || 'cn');
-            window.updateUIBasedOnDarkMode(window.isDarkMode || true);
-            window.updateTownNamesDiv(); // 初始化弯道名称显示
+            DongguanMapApp.updateUIBasedOnLanguage(window.currentLang || 'cn');
+            DongguanMapApp.updateUIBasedOnDarkMode(window.isDarkMode || true);
+            DongguanMapApp.updateTownNamesDiv(); 
         });
 
         // --- 关键：滚动事件监听器 ---
         // 监听滚动事件 (调用 main.js 中的函数)
         window.addEventListener('scroll', function () {
-            console.log("Scroll event fired!"); // 可选：调试用
+            // console.log("Scroll event fired!"); // 可选：调试用
 
             // 更新滚动条指示器 (如果需要)
             const scrollIndicator = document.getElementById('scrollIndicator');
@@ -317,9 +316,9 @@
 
             // 调用 main.js 中的更新函数
             // 确保 main.js 中定义了 updateScrollDistance 并且已暴露到 window
-            if (typeof window.updateScrollDistance === 'function') {
+            if (typeof DongguanMapApp.updateScrollDistance === 'function') {
                 // console.log("Calling updateScrollDistance from index.html"); // 可选：调试用
-                window.updateScrollDistance(); // 这是关键，调用 main.js 的函数
+                DongguanMapApp.updateScrollDistance(); // 这是关键，调用 main.js 的函数
             } else {
                 console.error("updateScrollDistance function not found on window object!");
             }
