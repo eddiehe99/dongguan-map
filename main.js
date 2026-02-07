@@ -17,7 +17,7 @@ const DongguanMapApp = (function () {
   // app state
   let currentLang = 'cn'; // 
   let showModal = false; // 模态框显示状态
-  let isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; // 深色模式
+  let isDarkMode = true
 
   // state related to town display
   let towns = [];
@@ -659,7 +659,7 @@ const DongguanMapApp = (function () {
 
     console.log("Dark mode toggled to:", isDarkMode); 
 
-    if (this.darkMode == true) {
+    if (isDarkMode == true) {
       root.classList.add("dark")
     }
     else {
