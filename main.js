@@ -143,107 +143,6 @@ const DongguanMapApp = (function () {
   }
 
 
-  // --- 定义更新 UI 的函数 ---
-  function updateUIBasedOnLanguage(lang) {
-    // a. 更新语言切换按钮的文本
-    const langToggleTextElement = document.getElementById('langToggleText');
-    if (langToggleTextElement) {
-      langToggleTextElement.textContent = lang === 'cn' ? '中文' : 'Chinese';
-    }
-
-    // b. 更新语言切换按钮的 CSS 类 (on/off)
-    const langToggleGroupElement = document.getElementById('langToggleGroup');
-    if (langToggleGroupElement) {
-      if (lang === 'cn') {
-        langToggleGroupElement.classList.add('on');
-        langToggleGroupElement.classList.remove('off');
-      } else {
-        langToggleGroupElement.classList.add('off');
-        langToggleGroupElement.classList.remove('on');
-      }
-    }
-
-    // c. 更新 #app 元素的类 (如果 main.css 依赖它来切换语言相关样式)
-    const appElement = document.getElementById('app');
-    if (appElement) {
-      appElement.classList.remove('cn', 'en'); // 移除旧类
-      appElement.classList.add(lang);          // 添加新类
-    }
-
-    // d. 更新其他依赖语言的内容 (如果有的话)
-    // 例如，更新 Logo 标题 (假设 HTML 结构允许)
-    const logoTitleElement = document.getElementById('logoTitle');
-    if (logoTitleElement) {
-      // 注意：这里直接替换整个 innerHTML，如果结构复杂可能需要更精细的操作
-      logoTitleElement.innerHTML = lang === 'cn' ? '东莞市地图（政区版）' : 'Dongguan Map';
-    }
-
-    // e. 更新其他控制按钮的文本 (如果 HTML 中给它们加了 id)
-    const darkModeTextElement = document.getElementById('darkModeToggleText');
-    if (darkModeTextElement) {
-      darkModeTextElement.textContent = lang === 'cn' ? '深色模式' : 'Dark Mode';
-    }
-    const aboutTextElement = document.getElementById('aboutLinkText');
-    if (aboutTextElement) {
-      aboutTextElement.textContent = lang === 'cn' ? '关于本站' : 'About';
-    }
-  }
-
-
-  function toggleLang() {
-    if (currentLang === "en") {
-      currentLang = "cn";
-    } else {
-      currentLang = "en";
-    }
-
-    window.currentLang = currentLang;
-    window.lang = currentLang;
-
-    console.log("Language toggled to:", currentLang); // 可选：调试用
-
-    updateUIBasedOnLanguage(currentLang);
-
-    updateTownIntroduction();
-
-    updateTownNamesDiv();
-  }
-
-
-  function updateUIBasedOnDarkMode(darkModeEnabled) {
-    // a. 更新深色模式按钮的 CSS 类 (on/off)
-    const darkModeToggleGroupElement = document.getElementById('darkModeToggleGroup');
-    if (darkModeToggleGroupElement) {
-      if (darkModeEnabled) {
-        darkModeToggleGroupElement.classList.add('on');
-        darkModeToggleGroupElement.classList.remove('off');
-      } else {
-        darkModeToggleGroupElement.classList.add('off');
-        darkModeToggleGroupElement.classList.remove('on');
-      }
-    }
-
-    // b. 更新页面或应用的主体样式 (例如，切换 body 或 #app 的类)
-    //    这通常需要 CSS 配合，例如 .dark-mode { background-color: #333; color: #fff; }
-    const appElement = document.getElementById('app'); // 或者是 document.body
-    if (appElement) {
-      appElement.classList.toggle('dark-mode', darkModeEnabled); // 根据 darkModeEnabled 的布尔值添加或移除 'dark-mode' 类
-    }
-  }
-
-  function toggleDarkMode() {
-    // 1. 切换深色模式状态
-    isDarkMode = !isDarkMode;
-
-    console.log("Dark mode toggled to:", isDarkMode); // 可选：调试用
-
-    // 2. 更新 UI
-    updateUIBasedOnDarkMode(isDarkMode);
-    // 注意：语言切换可能也会影响这个按钮的文本，所以最好也调用一次语言更新
-    updateUIBasedOnLanguage(currentLang); // 确保文本是根据当前语言显示的
-  }
-
-
   function updateTownIntroduction() {
     const container = document.getElementById('currentTownInfoContainer');
     const nameEl = document.getElementById('currentTownName');
@@ -663,6 +562,113 @@ const DongguanMapApp = (function () {
     //     el.remove();
     //   }
     // });
+  }
+
+
+  // --- 定义更新 UI 的函数 ---
+  function updateUIBasedOnLanguage(lang) {
+    // a. 更新语言切换按钮的文本
+    const langToggleTextElement = document.getElementById('langToggleText');
+    if (langToggleTextElement) {
+      langToggleTextElement.textContent = lang === 'cn' ? '中文' : 'Chinese';
+    }
+
+    // b. 更新语言切换按钮的 CSS 类 (on/off)
+    const langToggleGroupElement = document.getElementById('langToggleGroup');
+    if (langToggleGroupElement) {
+      if (lang === 'cn') {
+        langToggleGroupElement.classList.add('on');
+        langToggleGroupElement.classList.remove('off');
+      } else {
+        langToggleGroupElement.classList.add('off');
+        langToggleGroupElement.classList.remove('on');
+      }
+    }
+
+    // c. 更新 #app 元素的类 (如果 main.css 依赖它来切换语言相关样式)
+    const appElement = document.getElementById('app');
+    if (appElement) {
+      appElement.classList.remove('cn', 'en'); // 移除旧类
+      appElement.classList.add(lang);          // 添加新类
+    }
+
+    // d. 更新其他依赖语言的内容 (如果有的话)
+    // 例如，更新 Logo 标题 (假设 HTML 结构允许)
+    const logoTitleElement = document.getElementById('logoTitle');
+    if (logoTitleElement) {
+      // 注意：这里直接替换整个 innerHTML，如果结构复杂可能需要更精细的操作
+      logoTitleElement.innerHTML = lang === 'cn' ? '东莞市地图（政区版）' : 'Dongguan Map';
+    }
+
+    // e. 更新其他控制按钮的文本 (如果 HTML 中给它们加了 id)
+    const darkModeTextElement = document.getElementById('darkModeToggleText');
+    if (darkModeTextElement) {
+      darkModeTextElement.textContent = lang === 'cn' ? '深色模式' : 'Dark Mode';
+    }
+    const aboutTextElement = document.getElementById('aboutLinkText');
+    if (aboutTextElement) {
+      aboutTextElement.textContent = lang === 'cn' ? '关于本站' : 'About';
+    }
+  }
+
+
+  function toggleLang() {
+    if (currentLang === "en") {
+      currentLang = "cn";
+    } else {
+      currentLang = "en";
+    }
+
+    window.currentLang = currentLang;
+    window.lang = currentLang;
+
+    console.log("Language toggled to:", currentLang); // 可选：调试用
+
+    updateUIBasedOnLanguage(currentLang);
+
+    updateTownIntroduction();
+
+    updateTownNamesDiv();
+  }
+
+
+  function updateUIBasedOnDarkMode(darkModeEnabled) {
+    // a. 更新深色模式按钮的 CSS 类 (on/off)
+    const darkModeToggleGroupElement = document.getElementById('darkModeToggleGroup');
+    if (darkModeToggleGroupElement) {
+      if (darkModeEnabled) {
+        darkModeToggleGroupElement.classList.add('on');
+        darkModeToggleGroupElement.classList.remove('off');
+      } else {
+        darkModeToggleGroupElement.classList.add('off');
+        darkModeToggleGroupElement.classList.remove('on');
+      }
+    }
+
+    // b. 更新页面或应用的主体样式 (例如，切换 body 或 #app 的类)
+    //    这通常需要 CSS 配合，例如 .dark-mode { background-color: #333; color: #fff; }
+    const appElement = document.getElementById('app'); // 或者是 document.body
+    if (appElement) {
+      appElement.classList.toggle('dark-mode', darkModeEnabled); // 根据 darkModeEnabled 的布尔值添加或移除 'dark-mode' 类
+    }
+  }
+
+  function toggleDarkMode() {
+    // 1. 切换深色模式状态
+    isDarkMode = !isDarkMode;
+
+    console.log("Dark mode toggled to:", isDarkMode); 
+
+    if (this.darkMode == true) {
+      root.classList.add("dark")
+    }
+    else {
+      root.classList.remove("dark")
+    }
+
+    // 2. 更新 UI
+    updateUIBasedOnDarkMode(isDarkMode);
+    // 注意：语言切换可能也会影响这个按钮的文本，所以最好也调用一次语言更新
   }
 
 
