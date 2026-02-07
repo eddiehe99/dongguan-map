@@ -1,5 +1,5 @@
 let rootURL = document.baseURI
-var root = document.querySelector(':root')
+let root = document.querySelector(':root')
 const body = document.querySelector('body');
 if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
   root.classList.add('dark')
@@ -73,39 +73,6 @@ async function initApp() {
   updateScrollDistance();
 }
 
-document.addEventListener('DOMContentLoaded', initApp);
-
-// --- 定义 openModal 函数 ---
-// function openModal(type, img = null) {
-//   const modal = document.getElementById('modal');
-//   const modalBody = document.getElementById('modal-body');
-
-//   if (modal && modalBody) {
-//     // 清空之前的内容
-//     modalBody.innerHTML = '';
-
-//     if (type === 'text') {
-//       // 设置文本内容
-//       modalBody.innerHTML = aboutContent; // 使用上面定义的常量
-//     } else if (type === 'image' && img) {
-//       // 设置图片内容
-//       // 注意：移除了 URL 中的多余空格
-//       // let imgHtml = `<img src='https://s.anyway.red/nurburgring/${img.src}!/quality/80/progressive/true/ignore-error/true'/>`;
-//       let imgHtml = `<img src='${img.url}'/>`;
-//       if (img.url && img.author) {
-//         imgHtml += `<div class='source-in-modal'>@<a href='${img.url}' target='_blank'>${img.author}</a></div>`;
-//       }
-//       modalBody.innerHTML = imgHtml;
-//     }
-
-//     // 显示模态框
-//     modal.classList.add('show');
-//     // 如果需要，可以设置一个全局变量来跟踪模态框状态
-//     // window.showModal = true;
-//   } else {
-//     console.error("Modal or modal-body element not found.");
-//   }
-// }
 
 function openModal(type, img = null) {
   
@@ -146,16 +113,6 @@ function openModal(type, img = null) {
   }
 }
 
-// --- 定义 closeModal 函数 ---
-// function closeModal() {
-//   const modal = document.getElementById('modal');
-//   if (modal) {
-//     modal.classList.remove('show');
-//     // window.showModal = false;
-//   } else {
-//     console.error("Modal element not found for closing.");
-//   }
-// }
 
 // --- 修改 closeModal 函数 ---
 function closeModal(modalElement) {
@@ -179,32 +136,6 @@ function innerModal(event) {
   // 在 HTML 中已经通过 onclick="innerModal(event)" 绑定
   event.stopPropagation();
 }
-
-// --- 为模态框背景添加点击关闭功能 (在 DOM 加载完成后) ---
-document.addEventListener('DOMContentLoaded', function () {
-  const modal = document.getElementById('modal');
-  if (modal) {
-    // 当点击模态框背景 (非内容区域) 时，关闭模态框
-    modal.addEventListener('click', function (event) {
-      // 如果点击的是模态框背景 (modal 元素本身，而不是其子元素 .modal-content)
-      if (event.target === modal) {
-        closeModal();
-      }
-    });
-  }
-
-  // ... (之前的其他 DOMContentLoaded 内的事件监听器绑定代码) ...
-  const aboutLinkElement = document.getElementById('aboutLinkText');
-  if (aboutLinkElement) {
-    // 假设 openModal 函数已经定义并且暴露在 window 对象上
-    aboutLinkElement.addEventListener('click', function () {
-      window.openModal('text'); // 调用 main.js 中定义的 openModal 函数，传入 'text' 类型
-      // console.log("'About' link clicked, modal should open.")
-    });
-  } else {
-    console.warn("About link element with ID 'aboutLinkText' not found.");
-  }
-});
 
 // --- 将函数暴露到全局作用域，以便 HTML onclick 属性可以调用 ---
 // 确保这些函数在 HTML 尝试调用它们之前已经定义
@@ -319,29 +250,9 @@ function updateUIBasedOnLanguage(lang) {
   // --- 在这里添加更多需要根据语言更新的 UI 元素 ---
 }
 
-// --- 为语言切换按钮添加点击事件监听器 ---
-document.addEventListener("DOMContentLoaded", function () {
-  const langToggleElement = document.getElementById('langToggleGroup');
-  if (langToggleElement) {
-    langToggleElement.addEventListener('click', toggleLang);
-  } else {
-    console.warn("Language toggle element with ID 'langToggleGroup' not found in main.js.");
-  }
-
-  // --- 页面加载时，根据初始 lang 值设置 UI 状态 ---
-  // 这一步很重要，确保页面加载时按钮状态和文本是正确的
-  updateUIBasedOnLanguage(currentLang);
-});
-
 // --- 可选：将 currentLang 暴露到全局作用域，以便其他脚本访问 ---
 window.currentLang = currentLang; // 如果其他地方需要读取当前语言
 window.toggleLang = toggleLang;   // 如果其他地方需要触发语言切换
-
-// --- 假设 currentLang 变量已经在处理语言切换的代码中定义 ---
-// let currentLang = ...; // (从上面的代码继承)
-
-// --- 添加深色模式相关的状态 ---
-// let isDarkMode = false; // 初始状态设为 false (浅色模式)
 
 // --- 定义切换深色模式的函数 ---
 function toggleDarkMode() {
@@ -378,38 +289,20 @@ function updateUIBasedOnDarkMode(darkModeEnabled) {
   }
 }
 
-// --- 为深色模式切换按钮添加点击事件监听器 ---
-document.addEventListener("DOMContentLoaded", function () {
-  // ... (之前的 langToggleElement 事件监听器) ...
-
-  const darkModeToggleElement = document.getElementById('darkModeToggleGroup');
-  if (darkModeToggleElement) {
-    darkModeToggleElement.addEventListener('click', toggleDarkMode);
-  } else {
-    console.warn("Dark mode toggle element with ID 'darkModeToggleGroup' not found in main.js.");
-  }
-
-  // --- 页面加载时，根据初始 isDarkMode 值设置 UI 状态 ---
-  // 这一步很重要，确保页面加载时按钮状态是正确的
-  updateUIBasedOnDarkMode(isDarkMode);
-  // 同时也需要根据初始语言设置文本
-  updateUIBasedOnLanguage(currentLang);
-});
-
 // --- 可选：将 isDarkMode 暴露到全局作用域 ---
 window.isDarkMode = isDarkMode;
 window.toggleDarkMode = toggleDarkMode;
 
 function updateCornerDisplay() {
-  const container = document.getElementById('currentCornerInfoContainer');
-  const nameCnEl = document.getElementById('currentCornerNameCn');
-  const nameEnEl = document.getElementById('currentCornerNameEn');
-  const deSpan = document.getElementById('currentCornerDe');
-  const moreEl = document.getElementById('currentCornerMore');
+  const container = document.getElementById('currentTownInfoContainer');
+  const nameCnEl = document.getElementById('currentTownNameCn');
+  const nameEnEl = document.getElementById('currentTownNameEn');
+  // const deSpan = document.getElementById('currentCornerDe');
+  const moreEl = document.getElementById('currentCornerAbout');
   // 获取 thumbs 容器
   const thumbsContainer = document.getElementById('thumbsContainer');
 
-  if (container && nameCnEl && nameEnEl && deSpan && moreEl && thumbsContainer) {
+  if (container && nameCnEl && nameEnEl && moreEl && thumbsContainer) {
     const currentCornerId = (showCorner && currentCorner) ? currentCorner.id : null;
     if (currentCornerId !== previousCurrentCornerId) {
       // Update the stored ID
@@ -420,7 +313,7 @@ function updateCornerDisplay() {
         nameCnEl.className = 'primary skew-n title-font'; // 重置类名
         nameEnEl.textContent = '';
         nameEnEl.className = 'primary skew-n'; // 重置类名
-        deSpan.style.display = 'none'; // 默认隐藏德语
+        // deSpan.style.display = 'none'; // 默认隐藏德语
         moreEl.innerHTML = ''; // 注意：使用 innerHTML 有 XSS 风险，仅用于显示可信的 HTML
         thumbsContainer.innerHTML = ''; // 清空缩略图内容
         thumbsContainer.classList.add('hidden-area'); // 默认隐藏 thumbs 容器
@@ -662,7 +555,7 @@ function updateSvgHighlight() {
     }
   });
 
-  updateCornerNamesDiv();
+  updateTownNamesDiv();
 }
 
 window.updateScrollDistance = updateScrollDistance;
@@ -707,25 +600,7 @@ function setP(percentage) {
 
 window.setP = setP;
 
-// --- 确保在 DOM 加载完成后为 "回到起点" 按钮添加点击事件监听器 ---
-document.addEventListener("DOMContentLoaded", function () {
-  // ... (之前的事件监听器绑定代码) ...
-
-  const startOverBtn = document.getElementById('startOverBtn');
-  if (startOverBtn) {
-    // 假设 setP 函数已经定义并且暴露在 window 对象上
-    startOverBtn.addEventListener('click', function () {
-      window.setP(0.0); // 模拟 Vue 的 @click="setP(0.001)"
-      document.body.classList.remove("scrolled");
-    });
-  } else {
-    console.warn("Start over button with ID 'startOverBtn' not found.");
-  }
-
-  // ... (其他初始化代码) ...
-});
-
-function updateCornerNamesDiv() {
+function updateTownNamesDiv() {
   const container = document.getElementById('town-names-container');
   if (!container) return;
 
@@ -859,4 +734,69 @@ function updateCornerNamesDiv() {
   // });
 }
 
-window.updateCornerNamesDiv = updateCornerNamesDiv;
+window.updateTownNamesDiv = updateTownNamesDiv;
+
+function initAll(){
+  // load data and then initialize the app
+  initApp();
+
+  const modal = document.getElementById('modal');
+  if (modal) {
+    // 当点击模态框背景 (非内容区域) 时，关闭模态框
+    modal.addEventListener('click', function (event) {
+      // 如果点击的是模态框背景 (modal 元素本身，而不是其子元素 .modal-content)
+      if (event.target === modal) {
+        closeModal();
+      }
+    });
+  }
+
+  // bind event listener for "About" link
+  const aboutLinkElement = document.getElementById('aboutLinkText');
+  if (aboutLinkElement) {
+    // 假设 openModal 函数已经定义并且暴露在 window 对象上
+    aboutLinkElement.addEventListener('click', function () {
+      window.openModal('text'); // 调用 main.js 中定义的 openModal 函数，传入 'text' 类型
+      // console.log("'About' link clicked, modal should open.")
+    });
+  } else {
+    console.warn("About link element with ID 'aboutLinkText' not found.");
+  }
+
+  // bind event listener for language toggle
+  const langToggleElement = document.getElementById('langToggleGroup');
+  if (langToggleElement) {
+    langToggleElement.addEventListener('click', toggleLang);
+  } else {
+    console.warn("Language toggle element with ID 'langToggleGroup' not found in main.js.");
+  }
+
+  // bind event listener for dark mode toggle
+  const darkModeToggleElement = document.getElementById('darkModeToggleGroup');
+  if (darkModeToggleElement) {
+    darkModeToggleElement.addEventListener('click', toggleDarkMode);
+  } else {
+    console.warn("Dark mode toggle element with ID 'darkModeToggleGroup' not found in main.js.");
+  }
+
+  // bind event listener for "Start Over" button
+  const startOverBtn = document.getElementById('startOverBtn');
+  if (startOverBtn) {
+    // 假设 setP 函数已经定义并且暴露在 window 对象上
+    startOverBtn.addEventListener('click', function () {
+      window.setP(0.0); // 模拟 Vue 的 @click="setP(0.001)"
+      document.body.classList.remove("scrolled");
+    });
+  } else {
+    console.warn("Start over button with ID 'startOverBtn' not found.");
+  }
+
+  // --- 页面加载时，根据初始 isDarkMode 值设置 UI 状态 ---
+  // 这一步很重要，确保页面加载时按钮状态是正确的
+  updateUIBasedOnDarkMode(isDarkMode);
+  // 同时也需要根据初始语言设置文本
+  updateUIBasedOnLanguage(currentLang);
+
+}
+
+document.addEventListener('DOMContentLoaded', initAll);

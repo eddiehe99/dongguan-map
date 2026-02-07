@@ -52,7 +52,7 @@
                     </g> -->
                 </svg>
                 <div id="town-names-container">
-                    <!-- 这里的弯道名称将由 D3.js 动态添加 -->
+                    <!-- 由 D3.js 动态添加 -->
                 </div>
 
                 <!-- introMessage -->
@@ -97,25 +97,16 @@
                         <!-- <img src="https://s.anyway.red/nurburgring/logo.svg  " alt="纽北赛道地图" /> -->
                 </div>
             </div>
+
+            <!-- I don't want to modify the `.css` file written by JJ Ying. -->
             <div class="corner-info">
-                <div id="currentCornerInfoContainer" class="inner"> <!-- 初始隐藏，由 JS 控制 -->
+                <div id="currentTownInfoContainer" class="inner"> <!-- 初始隐藏，由 JS 控制 -->
                     <!-- 显示当前弯道名称 (中文) -->
-                    <div id="currentCornerNameCn" class="primary skew-n title-font"></div>
+                    <div id="currentTownNameCn" class="primary skew-n title-font"></div>
                     <!-- 显示当前弯道名称 (英文) -->
-                    <div id="currentCornerNameEn" class="primary skew-n"></div>
-                    <!-- 显示德语名称 -->
-                    <div id="currentCornerSecondary" class="secondary skew-n">
-                        <span id="currentCornerDe" class="extra"> <!-- 初始隐藏 -->
-                            <svg viewBox="0 0 5 3" class="skew-p">
-                                <rect id="black_stripe" width="5" height="3" y="0" x="0" fill="#000" />
-                                <rect id="red_stripe" width="5" height="2" y="1" x="0" fill="#6C6C6C" />
-                                <rect id="gold_stripe" width="5" height="1" y="2" x="0" fill="#DADADA" />
-                            </svg>
-                            <span id="currentCornerDeText"></span> <!-- 德语名称文本 -->
-                        </span>
-                    </div>
+                    <div id="currentTownNameEn" class="primary skew-n"></div>
                     <!-- 显示弯道介绍 (中文) -->
-                    <div id="currentCornerMore" class="more skew-n"></div>
+                    <div id="currentCornerAbout" class="more skew-n"></div>
                 </div>
 
                 <div id="endingMessageContainer" class="inner desc-msg" style="display: none;"> <!-- 初始隐藏 -->
@@ -148,11 +139,11 @@
                         <span id="aboutTextCn" class="lang-text" data-lang="cn">关于本站</span>
                         <span id="aboutTextEn" class="lang-text" data-lang="en" style="display: none;">About</span>
                     </div>
-                    <div class="toggle-group" id="darkModeToggleGroup" class="off"> <!-- 移除 :class 和 @click -->
+                    <div class="toggle-group off" id="darkModeToggleGroup"> <!-- 移除 :class 和 @click -->
                         <span id="darkModeToggleText">深色模式</span> <!-- 移除 v-if，添加 id 用于 JS 操作 -->
                         <div class="toggle"></div>
                     </div>
-                    <div class="toggle-group" id="langToggleGroup" class="off"> <!-- 移除 :class 和 @click -->
+                    <div class="toggle-group off" id="langToggleGroup"> <!-- 移除 :class 和 @click -->
                         <span id="langToggleText">中文</span> <!-- 移除 v-if，添加 id 用于 JS 操作 -->
                         <div class="toggle"></div>
                     </div>
@@ -177,7 +168,7 @@
                 <!-- 模态框关闭按钮 -->
                 <!-- class 包含 modal-close 基础样式和 skew-n 变形样式 -->
                 <!-- onclick="closeModal()" 绑定点击关闭事件 -->
-                <div class="modal-close skew-n" onclick="closeModal()">
+                <div class="modal-close skew-n" onclick="closeModal(this)">
                     <!-- 关闭按钮 SVG 图标 -->
                     <svg viewBox="0 0 30 30">
                         <circle cx="15" cy="15" r="12" />
@@ -287,13 +278,13 @@
             }).catch(function (error) {
                 console.error("Error loading GeoJSON:", error);
             }).finally(function () {
-                // --- 关键：在 D3.js Promise 完成（无论成功或失败）后，调用 updateCornerNamesDiv ---
-                // 确保 main.js 中的 updateCornerNamesDiv 函数已定义且 window.featureCentroids 已设置
-                if (window.updateCornerNamesDiv && window.featureCentroids) {
-                    // console.log("Calling updateCornerNamesDiv after GeoJSON load.");
-                    window.updateCornerNamesDiv(); // 调用 main.js 中的函数
+                // --- 关键：在 D3.js Promise 完成（无论成功或失败）后，调用 updateTownNamesDiv ---
+                // 确保 main.js 中的 updateTownNamesDiv 函数已定义且 window.featureCentroids 已设置
+                if (window.updateTownNamesDiv && window.featureCentroids) {
+                    // console.log("Calling updateTownNamesDiv after GeoJSON load.");
+                    window.updateTownNamesDiv(); // 调用 main.js 中的函数
                 } else {
-                    console.error("updateCornerNamesDiv function or featureCentroids not available.");
+                    console.error("updateTownNamesDiv function or featureCentroids not available.");
                 }
             });;
 
@@ -307,7 +298,7 @@
             // --- 初始化 UI (调用 main.js 中的函数) ---
             window.updateUIBasedOnLanguage(window.currentLang || 'cn');
             window.updateUIBasedOnDarkMode(window.isDarkMode || true);
-            window.updateCornerNamesDiv(); // 初始化弯道名称显示
+            window.updateTownNamesDiv(); // 初始化弯道名称显示
         });
 
         // --- 关键：滚动事件监听器 ---
